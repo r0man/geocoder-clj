@@ -10,7 +10,7 @@
 (def *point-url*
   "http://dev.virtualearth.net/REST/v1/Locations/point")
 
-(defn geocode-by-address [address & options]
+(defn geocode-address [address & options]
   (-> (client/get
        *locations-url*
        {:query-params
@@ -20,7 +20,7 @@
          :point (format-location location)}})
       :body read-json hyphenize-keys))
 
-(defn geocode-by-location [location & options]
+(defn geocode-location [location & options]
   (-> (client/get
        *point-url*
        {:query-params
