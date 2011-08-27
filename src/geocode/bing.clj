@@ -16,8 +16,7 @@
        {:query-params
         {:query address
          :key *api-key*
-         :includeEntityTypes "entityTypes"
-         :point (format-location location)}})
+         :includeEntityTypes "entityTypes"}})
       :body read-json hyphenize-keys))
 
 (defn geocode-location [location & options]
@@ -35,13 +34,13 @@
    :locality (:locality address)
    :region (:admin-district address)})
 
-(defn resources
-  "Returns the resources in the response."
+(defn results
+  "Returns the results in the response."
   [response] (flatten (map :resources (:resource-sets response))))
 
 (defn addresses
   "Returns the addresses in the response."
-  [response] (map to-address (map :address (resources response))))
+  [response] (map to-address (map :address (results response))))
 
 (defn address
   "Returns the first address in the response."
@@ -50,7 +49,7 @@
 (defn locations
   "Returns the locations in the response."
   [response]
-  (->> (resources response)
+  (->> (results response)
        (map (comp :coordinates :point))
        (map #(zipmap [:latitude :longitude] %))))
 
