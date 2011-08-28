@@ -1,58 +1,46 @@
 (ns geocoder.bing
-  (:require [clj-http.client :as client])
-  (:use [clojure.data.json :only (read-json)]
-        [inflections.core :only (hyphenize-keys)]
-        geocoder.helper))
+  (:use geocoder.address
+        geocoder.helper
+        geocoder.location
+        geocoder.provider))
 
-(def *locations-url*
-  "http://dev.virtualearth.net/REST/v1/Locations")
+(defn location-request [provider]
+  {:method :get
+   :url "http://dev.virtualearth.net/REST/v1/Locations"
+   :query-params {:key (:api-key provider)}})
 
-(def *point-url*
-  "http://dev.virtualearth.net/REST/v1/Locations/point")
+(defn point-request [provider]
+  {:method :get
+   :url "http://dev.virtualearth.net/REST/v1/Locations/point"
+   :query-params {:key (:api-key provider)}})
 
-(defn geocode-address [address & options]
-  (-> (client/get
-       *locations-url*
-       {:query-params
-        {:query address
-         :key *api-key*
-         :includeEntityTypes "entityTypes"}})
-      :body read-json hyphenize-keys))
+(defrecord Result []
+  IAddress
+  (city [result]
+    (:locality (:address result)))
+  (country [result]
+    {:name (:country-region (:address result))})
+  (location [result]
+    (apply make-location (:coordinates (:point result))))
+  (street-name [result]
+    (:address-line (:address result)))
+  (street-number [result]
+    nil)
+  (postal-code [result]
+    (:postal-code (:address result)))
+  (region [result]
+    (:state result)))
 
-(defn geocode-location [location & options]
-  (-> (client/get
-       *point-url*
-       {:query-params
-        {:key *api-key*
-         :includeEntityTypes "entityTypes"
-         :point (format-location location)}})
-      :body read-json hyphenize-keys))
+(defrecord Provider [api-key]
+  IProvider
+  (geocode [provider address options]
+    (->> (assoc-in (location-request provider) [:query-params :query] address)
+         json-request
+         ((partial results provider))))
+  (results [provider response]
+    (map #(merge (Result.) %) (mapcat :resources (:resource-sets response))))
+  (reverse-geocode [provider location options]
+    (->> (assoc-in (point-request provider) [:query-params :point] (format-location location))
+         json-request
+         ((partial results provider)))))
 
-(defn to-address [address]
-  {:country {:name (:country-region address)}
-   :formatted-address (:formatted-address address)
-   :locality (:locality address)
-   :region (:admin-district address)})
-
-(defn results
-  "Returns the results in the response."
-  [response] (flatten (map :resources (:resource-sets response))))
-
-(defn addresses
-  "Returns the addresses in the response."
-  [response] (map to-address (map :address (results response))))
-
-(defn address
-  "Returns the first address in the response."
-  [response] (first (addresses response)))
-
-(defn locations
-  "Returns the locations in the response."
-  [response]
-  (->> (results response)
-       (map (comp :coordinates :point))
-       (map #(zipmap [:latitude :longitude] %))))
-
-(defn location
-  "Returns the first location in the response."
-  [response] (first (locations response)))

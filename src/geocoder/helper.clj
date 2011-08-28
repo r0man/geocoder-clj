@@ -1,14 +1,7 @@
-(ns geocoder.helper)
+(ns geocoder.helper
+  (:require [clj-http.client :as client])
+  (:use [clojure.data.json :only (read-json)]
+        [inflections.core :only (hyphenize-keys)]))
 
-(def *api-key* nil)
-
-(defn format-location
-  "Format the location as query parameter."
-  [location] (str (:latitude location) "," (:longitude location)))
-
-(defmacro with-api-key
-  "Binds *api-key* to the given key."
-  [key & body]
-  `(binding [*api-key* ~key]
-     ~@body))
-
+(defn json-request [request]
+  (-> (client/request request) :body read-json hyphenize-keys))
