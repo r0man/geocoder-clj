@@ -35,4 +35,4 @@
   (reverse-geocode-request [provider location options]
     (-> (request provider)
         (assoc :url "http://dev.virtualearth.net/REST/v1/Locations/point")
-        (assoc-in [:query-params :point] (format-location location)))))
+        (assoc-in [:query-params :point] (to-str location)))))

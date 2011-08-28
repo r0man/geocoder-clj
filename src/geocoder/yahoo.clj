@@ -38,5 +38,5 @@
     (map #(merge (Result.) %) (:results (:result-set response))))
   (reverse-geocode-request [provider location options]
     (-> (request provider options)
-        (assoc-in [:query-params :location] (format-location location))
+        (assoc-in [:query-params :location] (to-str location))
         (assoc-in [:query-params :gflags] "R"))))

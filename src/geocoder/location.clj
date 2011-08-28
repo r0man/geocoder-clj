@@ -11,15 +11,15 @@
   (latitude [location]
     "Returns the latitude of location.")
   (longitude [location]
-    "Returns the longitude of location."))
+    "Returns the longitude of location.")
+  (to-str [location]
+    "Returns the string representation of location."))
 
 (extend-type clojure.lang.IPersistentMap
   ILocation
   (latitude [this]
     (:latitude this))
   (longitude [this]
-    (:longitude this)))
-
-(defn format-location
-  "Format the location as query parameter."
-  [location] (str (latitude location) "," (longitude location)))
+    (:longitude this))
+  (to-str [this]
+    (str (latitude this) "," (longitude this))))

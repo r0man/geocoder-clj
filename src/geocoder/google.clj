@@ -43,4 +43,4 @@
     (map #(merge (Result.) %) (:results response)))
   (reverse-geocode-request [provider location options]
     (-> (request provider options)
-        (assoc-in [:query-params :latlng] (format-location location)))))
+        (assoc-in [:query-params :latlng] (to-str location)))))

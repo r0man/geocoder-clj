@@ -2,8 +2,8 @@
   (:use clojure.test
         geocoder.location))
 
-(deftest test-format-location
-  (is (= "18.1586,-76.3553" (format-location {:latitude 18.1586 :longitude -76.3553}))))
+(deftest test-to-str
+  (is (= "18.1586,-76.3553" (to-str {:latitude 18.1586 :longitude -76.3553}))))
 
 (deftest test-latitude
   (is (= 43.4094 (latitude {:latitude 43.4094 :longitude -2.7003})))
