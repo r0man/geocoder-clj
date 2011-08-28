@@ -1,6 +1,5 @@
 (ns geocoder.bing
   (:use geocoder.address
-        geocoder.helper
         geocoder.location
         geocoder.provider))
 

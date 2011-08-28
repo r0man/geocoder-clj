@@ -4,7 +4,6 @@
         [clojure.data.json :only (read-json)]
         [inflections.core :only (hyphenize-keys)]
         geocoder.address
-        geocoder.helper
         geocoder.location
         geocoder.provider))
 

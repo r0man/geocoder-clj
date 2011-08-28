@@ -1,7 +1,6 @@
 (ns geocoder.google
   (:use [clojure.string :only (lower-case)]
         geocoder.address
-        geocoder.helper
         geocoder.location
         geocoder.provider))
 

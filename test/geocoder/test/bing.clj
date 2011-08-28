@@ -2,7 +2,6 @@
   (:use clojure.test
         geocoder.address
         geocoder.bing
-        geocoder.helper
         geocoder.location
         geocoder.provider))
 

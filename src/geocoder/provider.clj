@@ -1,5 +1,4 @@
-(ns geocoder.provider
-  (:use geocoder.helper))
+(ns geocoder.provider)
 
 (defprotocol IProvider
   (geocode-request [provider address options]

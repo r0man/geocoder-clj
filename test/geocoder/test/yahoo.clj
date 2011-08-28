@@ -3,7 +3,6 @@
         clojure.contrib.mock
         geocoder.address
         geocoder.location
-        geocoder.helper
         geocoder.provider
         geocoder.yahoo))
 

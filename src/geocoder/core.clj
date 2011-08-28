@@ -1,19 +1,24 @@
 (ns geocoder.core
-  (:require [geocoder.provider :as provider]
+  (:require [clj-http.client :as client]
+            [geocoder.provider :as provider]
             geocoder.bing
             geocoder.google
             geocoder.yahoo)
-  (:use geocoder.address
-        geocoder.helper))
+  (:use [clojure.data.json :only (read-json)]
+        [inflections.core :only (hyphenize-keys)]
+        geocoder.address))
 
 (def *provider*
   (geocoder.google.Provider.))
+
+(defn- request [request]
+  (-> (client/request request) :body read-json hyphenize-keys))
 
 (defn geocode
   "Geocode the address via the current *provider*."
   [address & options]
   (->> (provider/geocode-request *provider* address options)
-       (json-request)
+       (request)
        (provider/results *provider*)
        (map to-address)))
 
@@ -21,7 +26,7 @@
   "Reverse geocode the location via the current *provider*."
   [location & options]
   (->> (provider/reverse-geocode-request *provider* location options)
-       (json-request)
+       (request)
        (provider/results *provider*)
        (map to-address)))
 
