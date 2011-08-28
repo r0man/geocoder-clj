@@ -1,13 +1,37 @@
-# geocode-clj
+# GEOCODE-CLJ
 
-FIXME: write description
+A Clojure library for various geocoder services.
+
+## Installation
+
+Via Clojars: http://clojars.org/geocoder-clj
 
 ## Usage
 
-FIXME: write
+(use 'geocoder.core)
+
+(geocode "Senefelderstraße 24, 10437 Berlin")
+;=> ({:country {:name "Germany", :iso-3166-1-alpha-2 "de"},
+;=>   :city "Berlin",
+;=>   :location {:latitude 52.54258, :longitude 13.42299},
+;=>   :street-name "Senefelderstraße",
+;=>   :street-number "24",
+;=>   :postal-code "10437",
+;=>   :region "Berlin"})
+
+(reverse-geocode {:latitude 52.54258, :longitude 13.42299})
+;=> ({:country {:name "Germany", :iso-3166-1-alpha-2 "de"},
+;=>   :city "Berlin",
+;=>   :location {:latitude 52.54258, :longitude 13.42299},
+;=>   :street-name "Senefelderstraße",
+;=>   :street-number "24",
+;=>   :postal-code "10437",
+;=>   :region "Berlin"})
 
 ## License
 
 Copyright (C) 2011 Roman Scherer
 
 Distributed under the Eclipse Public License, the same as Clojure.
+
+
