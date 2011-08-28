@@ -22,4 +22,4 @@
 
 (defn format-location
   "Format the location as query parameter."
-  [location] (str (:latitude location) "," (:longitude location)))
+  [location] (str (latitude location) "," (longitude location)))
