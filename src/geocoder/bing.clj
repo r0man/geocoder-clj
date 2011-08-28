@@ -1,8 +1,8 @@
-(ns geocode.bing
+(ns geocoder.bing
   (:require [clj-http.client :as client])
   (:use [clojure.data.json :only (read-json)]
         [inflections.core :only (hyphenize-keys)]
-        geocode.helper))
+        geocoder.helper))
 
 (def *locations-url*
   "http://dev.virtualearth.net/REST/v1/Locations")

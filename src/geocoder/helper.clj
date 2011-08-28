@@ -1,4 +1,4 @@
-(ns geocode.helper)
+(ns geocoder.helper)
 
 (def *api-key* nil)
 

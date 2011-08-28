@@ -1,6 +1,6 @@
-(ns geocode.test.yahoo
+(ns geocoder.test.yahoo
   (:use clojure.test
-        geocode.yahoo))
+        geocoder.yahoo))
 
 (def response
   {:result-set

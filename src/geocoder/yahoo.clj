@@ -1,9 +1,9 @@
-(ns geocode.yahoo
+(ns geocoder.yahoo
   (:require [clj-http.client :as client])
   (:use [clojure.string :only (lower-case join)]
         [clojure.data.json :only (read-json)]
         [inflections.core :only (hyphenize-keys)]
-        geocode.helper))
+        geocoder.helper))
 
 (def *endpoint*
   "http://where.yahooapis.com/geocode")

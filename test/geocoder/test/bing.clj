@@ -1,6 +1,6 @@
-(ns geocode.test.bing
+(ns geocoder.test.bing
   (:use clojure.test
-        geocode.bing))
+        geocoder.bing))
 
 (def response
   {:resource-sets
