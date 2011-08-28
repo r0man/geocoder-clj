@@ -4,14 +4,8 @@
         geocoder.location
         geocoder.provider))
 
-(defn location-request [provider]
+(defn request [provider]
   {:method :get
-   :url "http://dev.virtualearth.net/REST/v1/Locations"
-   :query-params {:key (:api-key provider)}})
-
-(defn point-request [provider]
-  {:method :get
-   :url "http://dev.virtualearth.net/REST/v1/Locations/point"
    :query-params {:key (:api-key provider)}})
 
 (defrecord Result []
@@ -33,14 +27,13 @@
 
 (defrecord Provider [api-key]
   IProvider
-  (geocode [provider address options]
-    (->> (assoc-in (location-request provider) [:query-params :query] address)
-         json-request
-         ((partial results provider))))
+  (geocode-request [provider address options]
+    (-> (request provider)
+        (assoc :url "http://dev.virtualearth.net/REST/v1/Locations")
+        (assoc-in [:query-params :query] address)))
   (results [provider response]
     (map #(merge (Result.) %) (mapcat :resources (:resource-sets response))))
-  (reverse-geocode [provider location options]
-    (->> (assoc-in (point-request provider) [:query-params :point] (format-location location))
-         json-request
-         ((partial results provider)))))
-
+  (reverse-geocode-request [provider location options]
+    (-> (request provider)
+        (assoc :url "http://dev.virtualearth.net/REST/v1/Locations/point")
+        (assoc-in [:query-params :point] (format-location location)))))

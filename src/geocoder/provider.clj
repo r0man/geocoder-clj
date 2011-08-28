@@ -1,9 +1,10 @@
-(ns geocoder.provider)
+(ns geocoder.provider
+  (:use geocoder.helper))
 
 (defprotocol IProvider
-  (geocode [provider address options]
-    "Geocode the address.")
+  (geocode-request [provider address options]
+    "Returns the geocode request.")
   (results [provider response]
     "Returns the results in the response.")
-  (reverse-geocode [provider location options]
-    "Reverse geocode the location."))
+  (reverse-geocode-request [provider location options]
+    "Returns the reverse geocode request."))

@@ -8,12 +8,9 @@
         geocoder.location
         geocoder.provider))
 
-(def *endpoint*
-  "http://where.yahooapis.com/geocode")
-
-(defn request [provider]
+(defn request [provider & options]
   {:method :get
-   :url *endpoint*
+   :url "http://where.yahooapis.com/geocode"
    :query-params {:appid (:api-key provider) :flags "J"}})
 
 (defrecord Result []
@@ -38,18 +35,12 @@
 
 (defrecord Provider [api-key]
   IProvider
-  (geocode [provider address options]
-    (results
-     provider
-     (-> (request provider)
-         (assoc-in [:query-params :q] address)
-         json-request)))
+  (geocode-request [provider address options]
+    (-> (request provider options)
+        (assoc-in [:query-params :q] address)))
   (results [provider response]
     (map #(merge (Result.) %) (:results (:result-set response))))
-  (reverse-geocode [provider location options]
-    (results
-     provider
-     (-> (request provider)
-         (assoc-in [:query-params :location] (format-location location))
-         (assoc-in [:query-params :gflags] "R")
-         json-request))))
+  (reverse-geocode-request [provider location options]
+    (-> (request provider options)
+        (assoc-in [:query-params :location] (format-location location))
+        (assoc-in [:query-params :gflags] "R"))))

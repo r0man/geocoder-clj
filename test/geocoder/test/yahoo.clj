@@ -73,10 +73,21 @@
 (deftest test-region
   (is (= "Berlin" (region result))))
 
-(deftest test-geocode
-  (expect [json-request (returns response)]
-    (is (geocode (geocoder.yahoo.Provider. "key") "Senefelderstraße 24, 10437 Berlin" {}))))
+(deftest test-geocode-request
+  (let [request (geocode-request (geocoder.yahoo.Provider. "key") "Senefelderstraße 24, 10437 Berlin" {})]
+    (is (= :get (:method request)))
+    (is (= "http://where.yahooapis.com/geocode" (:url request)))
+    (let [query (:query-params request)]
+      (is (= "key" (:appid query)))
+      (is (= "J" (:flags query)))
+      (is (= "Senefelderstraße 24, 10437 Berlin" (:q query))))))
 
-(deftest test-reverse-geocode
-  (expect [json-request (returns response)]
-    (is (reverse-geocode (geocoder.yahoo.Provider. "key") (make-location 52.54254 13.423033) {}))))
+(deftest test-reverse-geocode-request
+  (let [request (reverse-geocode-request (geocoder.yahoo.Provider. "key") (make-location 52.54254 13.423033) {})]
+    (is (= :get (:method request)))
+    (is (= "http://where.yahooapis.com/geocode" (:url request)))
+    (let [query (:query-params request)]
+      (is (= "key" (:appid query)))
+      (is (= "J" (:flags query)))
+      (is (= "R" (:gflags query)))
+      (is (= "52.54254,13.423033" (:location query))))))

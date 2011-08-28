@@ -5,11 +5,10 @@
         geocoder.location
         geocoder.provider))
 
-(def *endpoint*
-  "http://maps.google.com/maps/api/geocode/json")
-
-(defn default-request []
-  {:method :get :url *endpoint* :query-params {:sensor false :language "en"}})
+(defn request [provider & options]
+  {:method :get
+   :url "http://maps.google.com/maps/api/geocode/json"
+   :query-params {:sensor false :language "en"}})
 
 (defn- extract
   "Extract the component from result."
@@ -38,13 +37,11 @@
 
 (defrecord Provider []
   IProvider
-  (geocode [provider address options]
-    (->> (assoc-in (default-request) [:query-params :address] address)
-         json-request
-         ((partial results provider))))
+  (geocode-request [provider address options]
+    (-> (request provider options)
+        (assoc-in [:query-params :address] address)))
   (results [provider response]
     (map #(merge (Result.) %) (:results response)))
-  (reverse-geocode [provider location options]
-    (->> (assoc-in (default-request) [:query-params :latlng] (format-location location))
-         json-request
-         ((partial results provider)))))
+  (reverse-geocode-request [provider location options]
+    (-> (request provider options)
+        (assoc-in [:query-params :latlng] (format-location location)))))

@@ -67,10 +67,21 @@
 (deftest test-region
   (is (= "Berlin" (region result))))
 
-(deftest test-geocode
-  (expect [json-request (returns response)]
-    (is (geocode (geocoder.google.Provider.) "Senefelderstraße 24, 10437 Berlin" {}))))
+(deftest test-geocode-request
+  (let [request (geocode-request (geocoder.google.Provider.) "Senefelderstraße 24, 10437 Berlin" {})]
+    (is (= :get (:method request)))
+    (is (= "http://maps.google.com/maps/api/geocode/json" (:url request)))
+    (let [query (:query-params request)]
+      (is (= "en" (:language query)))
+      (is (= false (:sensor query)))
+      (is (= "Senefelderstraße 24, 10437 Berlin" (:address query))))))
 
-(deftest test-reverse-geocode
-  (expect [json-request (returns response)]
-    (is (reverse-geocode (geocoder.google.Provider.) (make-location 52.54254 13.423033) {}))))
+(deftest test-reverse-geocode-request
+  (let [request (reverse-geocode-request (geocoder.google.Provider.) (make-location 52.54254 13.423033) {})]
+    (is (= :get (:method request)))
+    (is (= "http://maps.google.com/maps/api/geocode/json" (:url request)))
+    (let [query (:query-params request)]
+      (is (= "en" (:language query)))
+      (is (= false (:sensor query)))
+      (is (= "52.54254,13.423033" (:latlng query))))))
+

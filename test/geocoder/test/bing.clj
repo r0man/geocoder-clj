@@ -1,6 +1,5 @@
 (ns geocoder.test.bing
   (:use clojure.test
-        clojure.contrib.mock
         geocoder.address
         geocoder.bing
         geocoder.helper
@@ -39,8 +38,7 @@
    :trace-id
    "1b311004704a41f5900a09efca50de61|AMSM001403|02.00.126.3000|AMSMSNVM001956, AMSMSNVM001865, AMSMSNVM001321, AMSMSNVM001852"})
 
-(def result (merge (geocoder.bing.Result.)
-                   (first (mapcat :resources (:resource-sets response)))))
+(def result (merge (geocoder.bing.Result.) (first (mapcat :resources (:resource-sets response)))))
 
 (deftest test-city
   (is (= "Berlin" (city result))))
@@ -67,10 +65,18 @@
 (deftest test-region
   (is (nil? (region result))))
 
-(deftest test-geocode
-  (expect [json-request (returns response)]
-    (is (geocode (geocoder.bing.Provider. "key") "Senefelderstraße 24, 10437 Berlin" {}))))
+(deftest test-geocode-request
+  (let [request (geocode-request (geocoder.bing.Provider. "key") "Senefelderstraße 24, 10437 Berlin" {})]
+    (is (= :get (:method request)))
+    (is (= "http://dev.virtualearth.net/REST/v1/Locations" (:url request)))
+    (let [query (:query-params request)]
+      (is (= "key" (:key query)))
+      (is (= "Senefelderstraße 24, 10437 Berlin" (:query query))))))
 
-(deftest test-reverse-geocode
-  (expect [json-request (returns response)]
-    (is (reverse-geocode (geocoder.bing.Provider. "key") (make-location 52.54254 13.423033) {}))))
+(deftest test-reverse-geocode-request
+  (let [request (reverse-geocode-request (geocoder.bing.Provider. "key") (make-location 52.54254 13.423033) {})]
+    (is (= :get (:method request)))
+    (is (= "http://dev.virtualearth.net/REST/v1/Locations/point" (:url request)))
+    (let [query (:query-params request)]
+      (is (= "key" (:key query)))
+      (is (= "52.54254,13.423033" (:point query))))))
