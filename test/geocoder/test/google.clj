@@ -1,6 +1,5 @@
 (ns geocoder.test.google
   (:use clojure.test
-        clojure.contrib.mock
         geocoder.address
         geocoder.google
         geocoder.location
