@@ -2,6 +2,7 @@
   (:require [clj-http.client :as client]
             geocoder.bing
             geocoder.google
+            geocoder.maxmind
             geocoder.yahoo)
   (:use [clojure.data.json :only (read-json)]
         [inflections.core :only (hyphenize-keys)]
