@@ -1,3 +1,4 @@
 #!/usr/bin/env bash
-wget -c http://geolite.maxmind.com/download/geoip/database/GeoLiteCity.dat.gz
-gunzip GeoLiteCity.dat.gz
+mkdir -p ~/.maxmind
+wget -c http://geolite.maxmind.com/download/geoip/database/GeoLiteCity.dat.gz -O ~/.maxmind/GeoLiteCity.dat.gz
+gunzip -f ~/.maxmind/GeoLiteCity.dat.gz

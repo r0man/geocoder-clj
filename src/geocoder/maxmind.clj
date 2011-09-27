@@ -2,11 +2,16 @@
   (:import [com.maxmind.geoip LookupService])
   (:use [clojure.string :only (lower-case)]))
 
-(def ^:dynamic *service* nil)
+(def default-database
+  (format "%s/.maxmind/GeoLiteCity.dat" (System/getenv "HOME")))
 
 (defn make-service
   "Make a new Maxmind lookup service."
   [path] (LookupService. path))
+
+(def ^:dynamic *service*
+  (try (make-service default-database)
+       (catch Exception _ nil)))
 
 (defn- decode
   "Decode the Maxmind result into a map."
