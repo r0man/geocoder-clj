@@ -3,7 +3,7 @@
   (:use [clojure.string :only (lower-case)]))
 
 (def default-database
-  (format "%s/.maxmind/GeoLiteCity.dat" (System/getenv "HOME")))
+  (str (System/getenv "HOME") "/.maxmind/GeoLiteCity.dat"))
 
 (defn make-service
   "Make a new Maxmind lookup service."
