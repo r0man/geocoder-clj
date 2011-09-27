@@ -21,11 +21,11 @@
      :dma-code (. result dma_code)
      :metro-code (. result metro_code)}))
 
-(defn geocode
+(defn geocode-ip
   "Geocode the ip address."
   [ip-address] (decode (.getLocation *service* ip-address)))
 
-(defmacro with-database [database & body]
+(defmacro with-maxmind [database & body]
   `(with-open [database# (make-service ~database)]
      (binding [*service* database#]
        ~@body)))

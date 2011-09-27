@@ -2,12 +2,12 @@
   (:use geocoder.maxmind
         clojure.test))
 
-(deftest test-geocode
+(deftest test-geocode-ip
   (let [database "GeoLiteCity.dat"]
     (if (.exists (java.io.File. database))
-      (with-database database
-        (is (nil? (geocode "127.0.0.1")))
-        (let [result (geocode "92.229.192.11")]
+      (with-maxmind database
+        (is (nil? (geocode-ip "127.0.0.1")))
+        (let [result (geocode-ip "92.229.192.11")]
           (is (= "Germany" (:name (:country result))))
           (is (= "de" (:iso-3166-1-alpha-2 (:country result))))
           (is (= "16" (:id (:region result))))
