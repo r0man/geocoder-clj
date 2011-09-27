@@ -4,10 +4,13 @@
 
 (def ^:dynamic *service* nil)
 
-(defn make-service [path]
-  (LookupService. path))
+(defn make-service
+  "Make a new Maxmind lookup service."
+  [path] (LookupService. path))
 
-(defn- decode [result]
+(defn- decode
+  "Decode the Maxmind result into a map."
+  [result]
   (if (and result (not (=  -180.0 (. result latitude))))
     {:country
      {:name (. result countryName)
@@ -25,7 +28,18 @@
   "Geocode the ip address."
   [ip-address] (decode (.getLocation *service* ip-address)))
 
-(defmacro with-maxmind [database & body]
+(defmacro with-maxmind
+  "Evaluate body with the Maxmind lookup service bound to *service*."
+  [database & body]
   `(with-open [database# (make-service ~database)]
      (binding [*service* database#]
        ~@body)))
+
+(defn wrap-maxmind
+  "Wrap the Maxmind middleware around a Ring handler."
+  [handler]
+  (fn [request]
+    (handler
+     (if *service*
+       (assoc request :maxmind (geocode-ip (:remote-addr request)))
+       request))))
