@@ -35,8 +35,7 @@ Via Clojars: http://clojars.org/geocoder-clj
 ;=> {:country {:name "Germany", :iso-3166-1-alpha-2 "de"},
 ;=>  :region {:id "16"},
 ;=>  :city "Berlin",
-;=>  :location
-;=>  {:latitude 52.516693115234375, :longitude 13.399993896484375},
+;=>  :location {:latitude 52.516693115234375, :longitude 13.399993896484375},
 ;=>  :area-code 0,
 ;=>  :dma-code 0,
 ;=>  :metro-code 0}
