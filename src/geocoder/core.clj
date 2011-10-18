@@ -9,7 +9,7 @@
         geocoder.address
         geocoder.provider))
 
-(def ^:dynamic *provider*
+(def ^{:dynamic true} *provider*
   (geocoder.google.Provider.))
 
 (defn- fetch [request]

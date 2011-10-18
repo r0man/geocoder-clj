@@ -9,7 +9,7 @@
   "Make a new Maxmind lookup service."
   [path] (LookupService. path))
 
-(def ^:dynamic *service*
+(def ^{:dynamic true} *service*
   (try (make-service default-database)
        (catch Exception _ nil)))
 
