@@ -5,7 +5,7 @@
             geocoder.maxmind
             geocoder.yahoo)
   (:use [clojure.data.json :only (read-json)]
-        [inflections.core :only (hyphenize-keys)]
+        [inflections.core :only (hyphenize)]
         geocoder.address
         geocoder.provider))
 
@@ -14,7 +14,8 @@
 
 (defn- fetch [request]
   (->> (client/request request)
-       :body read-json hyphenize-keys
+       :body read-json
+       hyphenize
        (results *provider*)
        (map to-address)))
 
