@@ -51,7 +51,7 @@ Add this to your "~/.lein/init.clj" file.
 
 Or add this to the Leiningen "project.clj" file of your project.
 
-(defproject my-project "1.0.0
+(defproject my-project "1.0.0"
   :geocoder-config
   {:bing {:key "BING-API-KEY"}
    :geonames {:key "GEONAMES-API-KEY"}
