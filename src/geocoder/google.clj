@@ -12,7 +12,7 @@
   [attributes] (map->Geocoder (assoc attributes :name "Google")))
 
 (defn- make-request
-  "Make a geocode request map."
+  "Make a Google geocode request map."
   [provider & options]
   {:method :get
    :url "http://maps.google.com/maps/api/geocode/json"
@@ -24,7 +24,7 @@
   (first (filter #(contains? (set (:types %)) component) (:address-components response))))
 
 (defn- fetch
-  "Fetch and decode the response."
+  "Fetch and decode the Google geocode response."
   [request provider]
   (-> (fetch-json request)
       :results (decode provider)))

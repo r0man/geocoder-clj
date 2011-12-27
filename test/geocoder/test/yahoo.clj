@@ -69,6 +69,7 @@
 (deftest test-geocode-address
   (is (empty? (geocode-address geocoder "xxxxxxxxxxxxxxxxxxxxx" nil)))
   (let [address (first (geocode-address geocoder "Senefelderstraße 24, 10437 Berlin" nil))]
+    (is (= "Yahoo" (:provider address)))
     (is (= "Senefelderstrasse" (:street-name address)))
     (is (= "24" (:street-number address)))
     (is (= "10437" (:postal-code address)))

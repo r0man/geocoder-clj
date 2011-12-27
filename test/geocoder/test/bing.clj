@@ -51,6 +51,7 @@
 (deftest test-geocode-address
   (is (empty? (geocode-address geocoder "xxxxxxxxxxxxxxxxxxxxx" nil)))
   (let [address (first (geocode-address geocoder "Senefelderstraße 24, 10437 Berlin" nil))]
+    (is (= "Bing" (:provider address)))
     (is (= "Senefelderstraße 24" (:street-name address)))
     (is (nil? (:street-number address)))
     (is (= "10437" (:postal-code address)))
@@ -66,6 +67,7 @@
 (deftest test-geocode-location
   (is (empty? (geocode-location geocoder (make-location 0 0) nil)))
   (let [address (first (geocode-location geocoder (make-location 52.54254 13.423033) nil))]
+    (is (= "Bing" (:provider address)))
     (is (= "24 Senefelderstraße" (:street-name address)))
     (is (nil? (:street-number address)))
     (is (= "10437" (:postal-code address)))

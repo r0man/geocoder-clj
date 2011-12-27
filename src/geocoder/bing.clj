@@ -8,18 +8,18 @@
 (defrecord Geocoder [name key])
 
 (defn make-geocoder
-  "Make a Google geocoder."
+  "Make a Bing geocoder."
   [attributes]
   (if (:key attributes)
     (map->Geocoder (assoc attributes :name "Bing"))))
 
 (defn- make-request
-  "Make a geocode request map."
+  "Make a Bing geocode request map."
   [provider & options]
   {:method :get :query-params {:key (:key provider)}})
 
 (defn- fetch
-  "Fetch and decode the response."
+  "Fetch and decode the Bing geocode response."
   [request provider]
   (decode
    (->> (fetch-json request)
