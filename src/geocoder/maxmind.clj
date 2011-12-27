@@ -1,50 +1,59 @@
 (ns geocoder.maxmind
-  (:import [com.maxmind.geoip LookupService])
-  (:use [clojure.string :only (lower-case)]))
+  (:import [com.maxmind.geoip LookupService Location])
+  (:use [clojure.string :only (lower-case)]
+        [clojure.java.io :only (file)]
+        geocoder.config
+        geocoder.location
+        geocoder.provider))
+
+(def ^{:dynamic true} *geocoder* nil)
 
 (def default-database
   (str (System/getenv "HOME") "/.maxmind/GeoLiteCity.dat"))
 
-(defn make-service
-  "Make a new Maxmind lookup service."
-  [path] (LookupService. path))
+(defrecord Geocoder [name service])
 
-(def ^{:dynamic true} *service*
-  (try (make-service default-database)
-       (catch Exception _ nil)))
-
-(defn- decode
-  "Decode the Maxmind result into a map."
-  [result]
-  (if (and result (not (=  -180.0 (. result latitude))))
-    {:country
-     {:name (. result countryName)
-      :iso-3166-1-alpha-2 (if-let [code (. result countryCode)] (lower-case code))}
-     :region {:id (. result region)}
-     :city (. result city)
-     :location
-     {:latitude (double (. result latitude))
-      :longitude (double (. result longitude))}
-     :area-code (. result area_code)
-     :dma-code (. result dma_code)
-     :metro-code (. result metro_code)}))
-
-(defn geocode-ip
-  "Geocode the ip address."
-  [ip-address] (decode (.getLocation *service* ip-address)))
-
-(defmacro with-maxmind
-  "Evaluate body with the Maxmind lookup service bound to *service*."
-  [database & body]
-  `(with-open [database# (make-service ~database)]
-     (binding [*service* database#]
-       ~@body)))
+(defn make-geocoder
+  "Make a Maxmind geocoder."
+  [attributes]
+  (if-let [database (file (or (:database attributes) default-database))]
+    (if (.exists database)
+      (Geocoder. "Maxmind" (LookupService. database)))))
 
 (defn wrap-maxmind
   "Wrap the Maxmind middleware around a Ring handler."
   [handler]
   (fn [request]
     (handler
-     (if *service*
-       (assoc request :maxmind (geocode-ip (:remote-addr request)))
+     (if *geocoder*
+       (assoc request :maxmind (first (geocode-ip-address *geocoder* (:remote-addr request) nil)))
        request))))
+
+(extend-type Geocoder
+  IAddress
+  (city [_ address]
+    (. address city))
+  (country [_ address]
+    {:name (. address countryName)
+     :iso-3166-1-alpha-2 (if-let [code (. address countryCode)] (lower-case code))})
+  (location [_ address]
+    (make-location
+     (double (. address latitude))
+     (double (. address longitude))))
+  (street-name [_ address]
+    nil)
+  (street-number [_ address]
+    nil)
+  (postal-code [_ address]
+    nil)
+  (region [_ address]
+    {:id (. address region)}))
+
+(extend-type Geocoder
+  IGeocodeInternetAddress
+  (geocode-ip-address [provider ip-address options]
+    (if-let [location (.getLocation (:service provider) ip-address)]
+      (if (not (=  -180.0 (. location latitude)))
+        (decode [location] provider)))))
+
+(alter-var-root #'*geocoder* (constantly (make-geocoder (:maxmind *config*))))

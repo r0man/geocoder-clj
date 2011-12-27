@@ -10,7 +10,7 @@ Via Clojars: http://clojars.org/geocoder-clj
 
 (use 'geocoder.core)
 
-(geocode "Senefelderstraße 24, 10437 Berlin")
+(geocode-address "Senefelderstraße 24, 10437 Berlin")
 ;=> ({:country {:name "Germany", :iso-3166-1-alpha-2 "de"},
 ;=>   :city "Berlin",
 ;=>   :location {:latitude 52.54258, :longitude 13.42299},
@@ -19,7 +19,7 @@ Via Clojars: http://clojars.org/geocoder-clj
 ;=>   :postal-code "10437",
 ;=>   :region "Berlin"})
 
-(reverse-geocode {:latitude 52.54258, :longitude 13.42299})
+(geocode-location {:latitude 52.54258, :longitude 13.42299})
 ;=> ({:country {:name "Germany", :iso-3166-1-alpha-2 "de"},
 ;=>   :city "Berlin",
 ;=>   :location {:latitude 52.54258, :longitude 13.42299},
@@ -28,10 +28,7 @@ Via Clojars: http://clojars.org/geocoder-clj
 ;=>   :postal-code "10437",
 ;=>   :region "Berlin"})
 
-(use 'geocoder.maxmind)
-
-(with-maxmind "GeoLiteCity.dat"
-  (geocode-ip "92.229.192.11"))
+(geocode-ip-address "92.229.192.11")
 ;=> {:country {:name "Germany", :iso-3166-1-alpha-2 "de"},
 ;=>  :region {:id "16"},
 ;=>  :city "Berlin",
@@ -45,5 +42,3 @@ Via Clojars: http://clojars.org/geocoder-clj
 Copyright (C) 2011 Roman Scherer
 
 Distributed under the Eclipse Public License, the same as Clojure.
-
-

@@ -1,7 +1,7 @@
-(ns geocoder.credentials
+(ns geocoder.config
   (:use [clojure.java.io :only (file)]))
 
-(def ^:dynamic *credentials* {})
+(def ^:dynamic *config* {})
 
 (defn lein-init-file
   "Returns the Leiningen init.clj file."
@@ -23,40 +23,40 @@
   (if-let [file (file filename)]
     (and (.exists file) (= "project.clj"(.getName file)))))
 
-(defn lein-init-credentials
-  "Load the geocoder credentials from the Leiningen init.clj file."
+(defn lein-init-config
+  "Load the geocoder config from the Leiningen init.clj file."
   [& [filename]]
   (let [file (file (or filename (lein-init-file)))]
     (when (lein-init-file? file)
       (in-ns 'user)
       (load-file (str file))
-      (if-let [credentials (resolve 'user/geocoder-credentials)]
-        @credentials))))
+      (if-let [config (resolve 'user/geocoder-config)]
+        @config))))
 
-(defn lein-project-credentials
-  "Load the geocoder credentials from the Leiningen project.clj file."
+(defn lein-project-config
+  "Load the geocoder config from the Leiningen project.clj file."
   [& [filename]]
   (let [file (file (or filename (lein-project-file)))]
     (if (lein-project-file? file)
       (->> (read-string (slurp (str file)))
            (drop-while #(not (keyword? %1)))
            (apply hash-map)
-           :geocoder-credentials))))
+           :geocoder-config))))
 
-(defn load-credentials
-  "Load the geocoder credentials. If credentials is a map, it is
-  returned as it is. Otherwise credentials is interpreted as a
+(defn load-config
+  "Load the geocoder config. If config is a map, it is
+  returned as it is. Otherwise config is interpreted as a
   filename to a Leiningen's init.clj or a project.clj file."
-  [& [credentials]]
-  (or (if (map? credentials) credentials)
-      (lein-init-credentials credentials)
-      (lein-project-credentials credentials)))
+  [& [config]]
+  (or (if (map? config) config)
+      (lein-init-config config)
+      (lein-project-config config)))
 
-(defmacro with-credentials
-  "Evaluate body with *credentials* bound to the result
-  of (load-credentials credentials)."
-  [credentials & body]
-  `(binding [*credentials* (load-credentials ~credentials)]
+(defmacro with-config
+  "Evaluate body with *config* bound to the result
+  of (load-config config)."
+  [config & body]
+  `(binding [*config* (load-config ~config)]
      ~@body))
 
-(alter-var-root #'*credentials* (constantly (load-credentials)))
+(alter-var-root #'*config* (constantly (load-config)))

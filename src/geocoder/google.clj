@@ -1,46 +1,66 @@
 (ns geocoder.google
   (:use [clojure.string :only (lower-case)]
-        geocoder.address
         geocoder.location
         geocoder.provider))
 
-(defn request [provider & options]
+(def ^{:dynamic true} *geocoder* nil)
+
+(defrecord Geocoder [name])
+
+(defn make-geocoder
+  "Make a Google geocoder."
+  [attributes] (map->Geocoder (assoc attributes :name "Google")))
+
+(defn- make-request
+  "Make a geocode request map."
+  [provider & options]
   {:method :get
    :url "http://maps.google.com/maps/api/geocode/json"
    :query-params {:sensor false :language "en"}})
 
 (defn- extract
-  "Extract the component from result."
-  [result component]
-  (first (filter #(contains? (set (:types %)) component) (:address-components result))))
+  "Extract the address component from response."
+  [response component]
+  (first (filter #(contains? (set (:types %)) component) (:address-components response))))
 
-(defrecord Result []
+(defn- fetch
+  "Fetch and decode the response."
+  [request provider]
+  (-> (fetch-json request)
+      :results (decode provider)))
+
+(extend-type Geocoder
   IAddress
-  (city [result]
-    (:long-name (extract result "locality")))
-  (country [result]
-    {:name (:long-name (extract result "country"))
-     :iso-3166-1-alpha-2 (lower-case (:short-name (extract result "country")))})
-  (location [result]
+  (city [_ address]
+    (:long-name (extract address "locality")))
+  (country [_ address]
+    {:name (:long-name (extract address "country"))
+     :iso-3166-1-alpha-2 (lower-case (:short-name (extract address "country")))})
+  (location [_ address]
     (make-location
-     (:lat (:location (:geometry result)))
-     (:lng (:location (:geometry result)))))
-  (street-name [result]
-    (:long-name (extract result "route")))
-  (street-number [result]
-    (:long-name (extract result "street_number")))
-  (postal-code [result]
-    (:long-name (extract result "postal_code")))
-  (region [result]
-    (:long-name (extract result "administrative_area_level_1"))))
+     (:lat (:location (:geometry address)))
+     (:lng (:location (:geometry address)))))
+  (street-name [_ address]
+    (:long-name (extract address "route")))
+  (street-number [_ address]
+    (:long-name (extract address "street_number")))
+  (postal-code [_ address]
+    (:long-name (extract address "postal_code")))
+  (region [_ address]
+    (:long-name (extract address "administrative_area_level_1"))))
 
-(defrecord Provider []
-  IProvider
-  (geocode-request [provider address options]
-    (-> (request provider options)
-        (assoc-in [:query-params :address] address)))
-  (results [provider response]
-    (map #(merge (Result.) %) (:results response)))
-  (reverse-geocode-request [provider location options]
-    (-> (request provider options)
-        (assoc-in [:query-params :latlng] (to-str location)))))
+(extend-type Geocoder
+  IGeocodeAddress
+  (geocode-address [provider address options]
+    (-> (make-request provider options)
+        (assoc-in [:query-params :address] address)
+        (fetch provider))))
+
+(extend-type Geocoder
+  IGeocodeLocation
+  (geocode-location [provider location options]
+    (-> (make-request provider options)
+        (assoc-in [:query-params :latlng] (to-str location))
+        (fetch provider))))
+
+(alter-var-root #'*geocoder* (constantly (make-geocoder {})))

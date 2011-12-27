@@ -1,38 +1,63 @@
 (ns geocoder.bing
-  (:use geocoder.address
+  (:use geocoder.config
         geocoder.location
         geocoder.provider))
 
-(defn request [provider]
-  {:method :get
-   :query-params {:key (:api-key provider)}})
+(def ^{:dynamic true} *geocoder* nil)
 
-(defrecord Result []
+(defrecord Geocoder [name key])
+
+(defn make-geocoder
+  "Make a Google geocoder."
+  [attributes]
+  (if (:key attributes)
+    (map->Geocoder (assoc attributes :name "Bing"))))
+
+(defn- make-request
+  "Make a geocode request map."
+  [provider & options]
+  {:method :get :query-params {:key (:key provider)}})
+
+(defn- fetch
+  "Fetch and decode the response."
+  [request provider]
+  (decode
+   (->> (fetch-json request)
+        :resource-sets
+        (mapcat :resources))
+   provider))
+
+(extend-type Geocoder
   IAddress
-  (city [result]
-    (:locality (:address result)))
-  (country [result]
-    {:name (:country-region (:address result))})
-  (location [result]
-    (apply make-location (:coordinates (:point result))))
-  (street-name [result]
-    (:address-line (:address result)))
-  (street-number [result]
+  (city [_ address]
+    (:locality (:address address)))
+  (country [_ address]
+    {:name (:country-region (:address address))})
+  (location [_ address]
+    (apply make-location (:coordinates (:point address))))
+  (street-name [_ address]
+    (:address-line (:address address)))
+  (street-number [_ address]
     nil)
-  (postal-code [result]
-    (:postal-code (:address result)))
-  (region [result]
-    (:state result)))
+  (postal-code [_ address]
+    (:postal-code (:address address)))
+  (region [_ address]
+    (:state address)))
 
-(defrecord Provider [api-key]
-  IProvider
-  (geocode-request [provider address options]
-    (-> (request provider)
+(extend-type Geocoder
+  IGeocodeAddress
+  (geocode-address [provider address options]
+    (-> (make-request provider options)
         (assoc :url "http://dev.virtualearth.net/REST/v1/Locations")
-        (assoc-in [:query-params :query] address)))
-  (results [provider response]
-    (map #(merge (Result.) %) (mapcat :resources (:resource-sets response))))
-  (reverse-geocode-request [provider location options]
-    (-> (request provider)
-        (assoc :url "http://dev.virtualearth.net/REST/v1/Locations/point")
-        (assoc-in [:query-params :point] (to-str location)))))
+        (assoc-in [:query-params :query] address)
+        (fetch provider))))
+
+(extend-type Geocoder
+  IGeocodeLocation
+  (geocode-location [provider location options]
+    (-> (make-request provider options)
+        (assoc :url (str "http://dev.virtualearth.net/REST/v1/Locations/" (to-str location)))
+        (fetch provider))))
+
+(if-let [config (:bing *config*)]
+  (alter-var-root #'*geocoder* (constantly (make-geocoder config))))

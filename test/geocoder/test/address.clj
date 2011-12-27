@@ -22,6 +22,3 @@
   (is (= "24" (:street-number address)))
   (is (= "10437" (:postal-code address)))
   (is (= "Berlin" (:region address))))
-
-(deftest test-to-address
-  (is (= address (to-address address))))

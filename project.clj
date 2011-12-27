@@ -1,4 +1,4 @@
-(defproject geocoder-clj "0.0.4-SNAPSHOT"
+(defproject geocoder-clj "0.0.5-SNAPSHOT"
   :description "A Clojure library for various geocoding services."
   :dependencies [[clj-http "0.2.6"]
                  [inflections "0.6.5-SNAPSHOT"]

@@ -1,42 +1,69 @@
 (ns geocoder.yahoo
-  (:use [clojure.string :only (lower-case)]
-        geocoder.address
+  (:use [clojure.string :only (blank? lower-case)]
+        geocoder.config
         geocoder.location
         geocoder.provider))
 
-(defn request [provider & options]
+(def ^{:dynamic true} *geocoder* nil)
+
+(defrecord Geocoder [name key])
+
+(defn make-geocoder
+  "Make a Google geocoder."
+  [attributes]
+  (if (:key attributes)
+    (map->Geocoder (assoc attributes :name "Yahoo"))))
+
+(defn- make-request
+  "Make a Yahoo geocoder request map."
+  [provider & options]
   {:method :get
    :url "http://where.yahooapis.com/geocode"
    :query-params {:appid (:api-key provider) :flags "J"}})
 
-(defrecord Result []
-  IAddress
-  (city [result]
-    (:city result))
-  (country [result]
-    {:name (:country result)
-     :iso-3166-1-alpha-2 (lower-case (:countrycode result))})
-  (location [result]
-    (make-location
-     (:latitude result)
-     (:longitude result)))
-  (street-name [result]
-    (:street result))
-  (street-number [result]
-    (:house result))
-  (postal-code [result]
-    (:postal result))
-  (region [result]
-    (:state result)))
+(defn- fetch
+  "Fetch and decode the Yahoo geocoder response."
+  [request provider]
+  (let [response
+        (-> (fetch-json request)
+            :result-set :results)]
+    (if (not (blank? (:country (first response))))
+      (decode response provider))))
 
-(defrecord Provider [api-key]
-  IProvider
-  (geocode-request [provider address options]
-    (-> (request provider options)
-        (assoc-in [:query-params :q] address)))
-  (results [provider response]
-    (map #(merge (Result.) %) (:results (:result-set response))))
-  (reverse-geocode-request [provider location options]
-    (-> (request provider options)
+(extend-type Geocoder
+  IAddress
+  (city [_ address]
+    (:city address))
+  (country [_ address]
+    {:name (:country address)
+     :iso-3166-1-alpha-2 (lower-case (:countrycode address))})
+  (location [_ address]
+    (make-location
+     (:latitude address)
+     (:longitude address)))
+  (street-name [_ address]
+    (:street address))
+  (street-number [_ address]
+    (:house address))
+  (postal-code [_ address]
+    (:postal address))
+  (region [_ address]
+    (:state address)))
+
+(extend-type Geocoder
+  IGeocodeAddress
+  (geocode-address [provider address options]
+    (-> (make-request provider options)
+        (assoc-in [:query-params :q] address)
+        (fetch provider))))
+
+(extend-type Geocoder
+  IGeocodeLocation
+  (geocode-location [provider location options]
+    (-> (make-request provider options)
         (assoc-in [:query-params :location] (to-str location))
-        (assoc-in [:query-params :gflags] "R"))))
+        (assoc-in [:query-params :gflags] "R")
+        (fetch provider))))
+
+(if-let [config (:yahoo *config*)]
+  (alter-var-root #'*geocoder* (constantly (make-geocoder config))))

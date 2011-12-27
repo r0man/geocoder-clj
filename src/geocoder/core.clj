@@ -1,36 +1,38 @@
 (ns geocoder.core
-  (:require [clj-http.client :as client]
-            geocoder.bing
-            geocoder.google
-            geocoder.maxmind
-            geocoder.yahoo)
-  (:use [clojure.data.json :only (read-json)]
-        [inflections.core :only (hyphenize)]
-        geocoder.address
-        geocoder.provider))
+  (:require [geocoder.provider :as provider])
+  (:use geocoder.config))
 
-(def ^{:dynamic true} *provider*
-  (geocoder.google.Provider.))
+(def ^{:dynamic true} *providers* [])
 
-(defn- fetch [request]
-  (->> (client/request request)
-       :body read-json
-       hyphenize
-       (results *provider*)
-       (map to-address)))
+(defn- find-providers [predicate]
+  (filter predicate *providers*))
 
-(defn geocode
-  "Geocode the address via the current *provider*."
+(defn- geocode-first [providers geocode-fn what options]
+  (first (filter (complement empty?) (map #(geocode-fn %1 what options) providers))))
+
+(defn geocode-address
+  "Geocode the address."
   [address & options]
-  (fetch (geocode-request *provider* address options)))
+  (-> (find-providers provider/supports-address-geocoding?)
+      (geocode-first provider/geocode-address address options)))
 
-(defn reverse-geocode
-  "Reverse geocode the location via the current *provider*."
+(defn geocode-ip-address
+  "Geocode the internet address."
+  [ip-address & options]
+  (-> (find-providers provider/supports-ip-address-geocoding?)
+      (geocode-first provider/geocode-ip-address ip-address options)))
+
+(defn geocode-location
+  "Geocode the location."
   [location & options]
-  (fetch (reverse-geocode-request *provider* location options)))
+  (-> (find-providers provider/supports-location-geocoding?)
+      (geocode-first provider/geocode-location location options)))
 
-(defmacro with-provider
-  "Evaluate body with provider bound to *provider*."
-  [provider & body]
-  `(binding [*provider* ~provider]
-     ~@body))
+(defn init-providers []
+  (doseq [provider [:google :bing :yahoo :maxmind]
+          :let [ns (symbol (str "geocoder." (name provider)))]]
+    (require ns)
+    (if-let [geocoder ((ns-resolve ns 'make-geocoder) (provider *config*))]
+      (alter-var-root #'*providers* conj geocoder))))
+
+(init-providers)
