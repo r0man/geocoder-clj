@@ -6,6 +6,26 @@ A Clojure library for various geocoder services.
 
 Via Clojars: http://clojars.org/geocoder-clj
 
+## Configuration
+
+Most of the geocode services used by this library must be configured
+before being accessible.
+
+Add this to your "~/.lein/init.clj" file.
+
+(def geocoder-config
+  {:bing {:key "BING-API-KEY"}
+   :geonames {:key "GEONAMES-API-KEY"}
+   :yahoo {:key "YAHOO-API-KEY"}})
+
+Or add this to the Leiningen "project.clj" file of your project.
+
+(defproject my-project "1.0.0
+  :geocoder-config
+  {:bing {:key "BING-API-KEY"}
+   :geonames {:key "GEONAMES-API-KEY"}
+   :yahoo {:key "YAHOO-API-KEY"}})
+
 ## Usage
 
 (use 'geocoder.core)
