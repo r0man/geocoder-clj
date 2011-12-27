@@ -1,7 +1,6 @@
 (ns geocoder.provider
   (:require [clj-http.client :as client])
   (:use [clojure.data.json :only (read-json)]
-        [geocoder.address :only (make-address)]
         [inflections.core :only (hyphenize)]))
 
 (defprotocol IAddress
@@ -37,15 +36,14 @@
   [response provider]
   (map
    #(with-meta
-      (make-address
-       :city (city provider %1)
+      {:city (city provider %1)
        :country (country provider %1)
        :location (location provider %1)
        :street-name (street-name provider %1)
        :street-number (street-number provider %1)
        :postal-code (postal-code provider %1)
        :region (region provider %1)
-       :provider (:name provider))
+       :provider (:name provider)}
       (if (map? %1) %1))
    (remove nil? (if (sequential? response) response [response]))))
 
