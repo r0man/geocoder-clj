@@ -29,7 +29,7 @@
       (geocode-first provider/geocode-location location options)))
 
 (defn init-providers []
-  (doseq [provider [:google :bing :yahoo :maxmind]
+  (doseq [provider [:google :bing :yahoo :geonames :maxmind]
           :let [ns (symbol (str "geocoder." (name provider)))]]
     (require ns)
     (if-let [geocoder ((ns-resolve ns 'make-geocoder) (provider *config*))]
