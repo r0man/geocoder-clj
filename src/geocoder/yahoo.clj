@@ -65,5 +65,4 @@
         (assoc-in [:query-params :gflags] "R")
         (fetch provider))))
 
-(if-let [config (:yahoo *config*)]
-  (alter-var-root #'*geocoder* (constantly (make-geocoder config))))
+(alter-var-root #'*geocoder* (constantly (make-geocoder (:yahoo *config*))))

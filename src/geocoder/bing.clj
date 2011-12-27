@@ -59,5 +59,4 @@
         (assoc :url (str "http://dev.virtualearth.net/REST/v1/Locations/" (to-str location)))
         (fetch provider))))
 
-(if-let [config (:bing *config*)]
-  (alter-var-root #'*geocoder* (constantly (make-geocoder config))))
+(alter-var-root #'*geocoder* (constantly (make-geocoder (:bing *config*))))
