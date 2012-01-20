@@ -4,7 +4,7 @@
         geocoder.location
         geocoder.provider))
 
-(def geocoder (make-geocoder {:key "demo"}))
+(def geocoder (make-geocoder {:key "geonamesclj"}))
 
 (def response
   {:admin-code1 "BE"
