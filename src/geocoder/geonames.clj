@@ -12,7 +12,7 @@
   "Make a Geonames geocoder."
   [attributes]
   (if (:key attributes)
-    (map->Geocoder (assoc attributes :name "Geonames"))))
+    (Geocoder. "Geonames" (:key attributes))))
 
 (defn- make-request
   "Make a Geonames geocode request map."

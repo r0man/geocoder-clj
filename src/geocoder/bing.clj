@@ -11,7 +11,7 @@
   "Make a Bing geocoder."
   [attributes]
   (if (:key attributes)
-    (map->Geocoder (assoc attributes :name "Bing"))))
+    (Geocoder. "Bing" (:key attributes))))
 
 (defn- make-request
   "Make a Bing geocode request map."

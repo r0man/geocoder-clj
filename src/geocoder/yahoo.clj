@@ -12,7 +12,7 @@
   "Make a Google geocoder."
   [attributes]
   (if (:key attributes)
-    (map->Geocoder (assoc attributes :name "Yahoo"))))
+    (Geocoder. "Yahoo" (:key attributes))))
 
 (defn- make-request
   "Make a Yahoo geocoder request map."

@@ -9,7 +9,7 @@
 
 (defn make-geocoder
   "Make a Google geocoder."
-  [attributes] (map->Geocoder (assoc attributes :name "Google")))
+  [attributes] (Geocoder. "Google"))
 
 (defn- make-request
   "Make a Google geocode request map."
