@@ -13,20 +13,23 @@
 (defn geocode-address
   "Geocode the address."
   [address & options]
-  (-> (find-providers provider/supports-address-geocoding?)
-      (geocode-first provider/geocode-address address options)))
+  (if address
+    (-> (find-providers provider/supports-address-geocoding?)
+        (geocode-first provider/geocode-address address options))))
 
 (defn geocode-ip-address
   "Geocode the internet address."
   [ip-address & options]
-  (-> (find-providers provider/supports-ip-address-geocoding?)
-      (geocode-first provider/geocode-ip-address ip-address options)))
+  (if ip-address
+    (-> (find-providers provider/supports-ip-address-geocoding?)
+        (geocode-first provider/geocode-ip-address ip-address options))))
 
 (defn geocode-location
   "Geocode the location."
   [location & options]
-  (-> (find-providers provider/supports-location-geocoding?)
-      (geocode-first provider/geocode-location location options)))
+  (if location
+    (-> (find-providers provider/supports-location-geocoding?)
+        (geocode-first provider/geocode-location location options))))
 
 (defn init-providers []
   (doseq [provider [:google :bing :yahoo :geonames :maxmind]
