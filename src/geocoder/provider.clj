@@ -1,6 +1,6 @@
 (ns geocoder.provider
   (:require [clj-http.client :as client])
-  (:use [clojure.data.json :only (read-json)]
+  (:use [clojure.data.json :only (read-str)]
         [inflections.core :only (hyphenize)]))
 
 (defprotocol IAddress
@@ -51,8 +51,9 @@
   "Send the request, parse the JSON body and return the response as a
   hyphenized map."
   [request]
-  (->> (client/request request)
-       :body read-json hyphenize))
+  (let [read-json #(read-str %1 :key-fn keyword)]
+    (->> (client/request request)
+         :body read-json hyphenize)))
 
 (defn supports-address-geocoding?
   "Returns true if provider supports address geocoding, otherwise false."
