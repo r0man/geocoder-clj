@@ -71,7 +71,7 @@
     (is (= "24 Senefelderstraße" (:street-name address)))
     (is (nil? (:street-number address)))
     (is (= "10437" (:postal-code address)))
-    (is (= "Prenzlauer Berg" (:city address)))
+    (is (= "Berlin" (:city address)))
     (is (nil? (:region address)))
     (let [country (:country address)]
       (is (nil? (:iso-3166-1-alpha-2 country)))
