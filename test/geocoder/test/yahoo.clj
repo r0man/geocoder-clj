@@ -70,7 +70,7 @@
   (is (empty? (geocode-address geocoder "xxxxxxxxxxxxxxxxxxxxx" nil)))
   (let [address (first (geocode-address geocoder "Senefelderstraße 24, 10437 Berlin" nil))]
     (is (= "Yahoo" (:provider address)))
-    (is (= "Senefelderstrasse" (:street-name address)))
+    (is (= "Senefelderstraße" (:street-name address)))
     (is (= "24" (:street-number address)))
     (is (= "10437" (:postal-code address)))
     (is (= "Berlin" (:city address)))
@@ -79,14 +79,14 @@
       (is (= "de" (:iso-3166-1-alpha-2 country)))
       (is (= "Germany" (:name country))))
     (let [location (:location address)]
-      (is (= 52.542526 (:latitude location)))
-      (is (= 13.42324 (:longitude location))))))
+      (is (= 52.542519 (:latitude location)))
+      (is (= 13.42325 (:longitude location))))))
 
 (deftest test-geocode-location
   (is (empty? (geocode-location geocoder (make-location 0 0) nil)))
   (let [address (first (geocode-location geocoder (make-location 52.542526 13.42324) nil))]
     (is (= "Yahoo" (:provider address)))
-    (is (= "Senefelderstrasse" (:street-name address)))
+    (is (= "Senefelderstraße" (:street-name address)))
     (is (= "24" (:street-number address)))
     (is (= "10437" (:postal-code address)))
     (is (= "Berlin" (:city address)))
@@ -95,8 +95,8 @@
       (is (= "de" (:iso-3166-1-alpha-2 country)))
       (is (= "Germany" (:name country))))
     (let [location (:location address)]
-      (is (= 52.542526 (:latitude location)))
-      (is (= 13.42324 (:longitude location))))))
+      (is (= 52.542517 (:latitude location)))
+      (is (= 13.423235 (:longitude location))))))
 
 (deftest test-supports-address-geocoding?
   (is (supports-address-geocoding? geocoder)))
