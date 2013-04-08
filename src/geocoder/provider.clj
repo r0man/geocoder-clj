@@ -1,7 +1,7 @@
 (ns geocoder.provider
-  (:require [clj-http.client :as client])
-  (:use [clojure.data.json :only (read-str)]
-        [inflections.core :only (hyphenize)]))
+  (:require [cheshire.core :refer [parse-string]]
+            [clj-http.client :as client]
+            [inflections.core :refer [hyphenize]]))
 
 (defprotocol IAddress
   (city [provider address]
@@ -51,7 +51,7 @@
   "Send the request, parse the JSON body and return the response as a
   hyphenized map."
   [request]
-  (let [read-json #(read-str %1 :key-fn keyword)]
+  (let [read-json #(parse-string %1 true)]
     (->> (client/request request)
          :body read-json hyphenize)))
 
