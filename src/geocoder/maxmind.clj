@@ -1,10 +1,10 @@
 (ns geocoder.maxmind
   (:import [com.maxmind.geoip LookupService Location])
-  (:use [clojure.string :only (lower-case)]
-        [clojure.java.io :only (file)]
-        geocoder.config
-        geocoder.location
-        geocoder.provider))
+  (:require [clojure.java.io :refer [file]]
+            [clojure.string :refer [lower-case]]
+            [geo.core :refer [point point-x point-y]]
+            [geocoder.config :refer [*config*]]
+            [geocoder.provider :refer :all]))
 
 (def ^{:dynamic true} *geocoder* nil)
 
@@ -37,9 +37,10 @@
     {:name (. address countryName)
      :iso-3166-1-alpha-2 (if-let [code (. address countryCode)] (lower-case code))})
   (location [_ address]
-    (make-location
-     (double (. address latitude))
-     (double (. address longitude))))
+    (point
+     4326
+     (double (. address longitude))
+     (double (. address latitude))))
   (street-name [_ address]
     nil)
   (street-number [_ address]

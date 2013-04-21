@@ -1,7 +1,8 @@
 (ns geocoder.test.maxmind
-  (:use clojure.test
-        geocoder.maxmind
-        geocoder.provider))
+  (:require [clojure.test :refer :all]
+            [geo.core :refer [point-x point-y]]
+            [geocoder.maxmind :refer :all]
+            [geocoder.provider :refer :all]))
 
 (def ip-address "92.229.192.11")
 
@@ -17,8 +18,8 @@
     (is (= "de" (:iso-3166-1-alpha-2 (:country result))))
     (is (= "16" (:id (:region result))))
     (is (= "Berlin" (:city result)))
-    (is (= 52.516693115234375 (:latitude (:location result))))
-    (is (= 13.399993896484375 (:longitude (:location result))))))
+    (is (= 52.516693115234375 (point-y (:location result))))
+    (is (= 13.399993896484375 (point-x (:location result))))))
 
 (deftest test-supports-address-geocoding?
   (is (not (supports-address-geocoding? *geocoder*))))

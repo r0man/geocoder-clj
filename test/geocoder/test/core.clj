@@ -1,8 +1,9 @@
 (ns geocoder.test.core
-  (:require [geocoder.maxmind :as maxmind]
-            [geocoder.provider :as provider])
-  (:use clojure.test
-        geocoder.core))
+  (:require [clojure.test :refer :all]
+            [geo.core :refer [point]]
+            [geocoder.core :refer :all]
+            [geocoder.maxmind :as maxmind]
+            [geocoder.provider :as provider]))
 
 (def ^:dynamic *geocoder* (first *providers*))
 
@@ -20,6 +21,6 @@
 
 (deftest test-geocode-location
   (is (nil? (geocode-location nil)))
-  (let [location {:latitude 52.519171 :longitude 13.4060912}]
+  (let [location (point 4326 13.4060912 52.519171)]
     (is (= (geocode-location location)
            (provider/geocode-location *geocoder* location {})))))

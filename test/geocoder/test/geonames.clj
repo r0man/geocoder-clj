@@ -1,8 +1,8 @@
 (ns geocoder.test.geonames
-  (:use clojure.test
-        geocoder.geonames
-        geocoder.location
-        geocoder.provider))
+  (:require [clojure.test :refer :all]
+            [geo.core :refer [point point-x point-y]]
+            [geocoder.geonames :refer :all]
+            [geocoder.provider :refer :all]))
 
 (def geocoder (make-geocoder {:key "geonamesclj"}))
 
@@ -25,8 +25,8 @@
 
 (deftest test-location
   (let [location (location geocoder response)]
-    (is (= 52.5161166666667 (:latitude location)))
-    (is (= 13.38735 (:longitude location)))))
+    (is (= 52.5161166666667 (point-y location)))
+    (is (= 13.38735 (point-x location)))))
 
 (deftest test-street-name
   (is (nil? (street-name geocoder response))))
@@ -57,12 +57,12 @@
       (is (= "de" (:iso-3166-1-alpha-2 country)))
       (is (nil? (:name country))))
     (let [location (:location address)]
-      (is (= 52.5161166666667 (:latitude location)))
-      (is (= 13.38735 (:longitude location))))))
+      (is (= 52.5161166666667 (point-y location)))
+      (is (= 13.38735 (point-x location))))))
 
 (deftest test-geocode-location
-  (is (empty? (geocode-location geocoder (make-location 0 0) nil)))
-  (let [address (first (geocode-location geocoder (make-location 52.5161166666667 13.38735) nil))]
+  (is (empty? (geocode-location geocoder (point 4326 0 0) nil)))
+  (let [address (first (geocode-location geocoder (point 4326 13.38735 52.5161166666667) nil))]
     (is (= "Geonames" (:provider address)))
     (is (nil? (:street-name address)))
     (is (nil? (:street-number address)))
@@ -73,8 +73,8 @@
       (is (= "de" (:iso-3166-1-alpha-2 country)))
       (is (nil? (:name country))))
     (let [location (:location address)]
-      (is (= 52.5161166666667 (:latitude location)))
-      (is (= 13.38735 (:longitude location))))))
+      (is (= 52.5161166666667 (point-y location)))
+      (is (= 13.38735 (point-x location))))))
 
 (deftest test-supports-address-geocoding?
   (is (supports-address-geocoding? geocoder)))

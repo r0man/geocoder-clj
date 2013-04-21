@@ -1,8 +1,8 @@
 (ns geocoder.test.bing
-  (:use clojure.test
-        geocoder.bing
-        geocoder.location
-        geocoder.provider))
+  (:require [clojure.test :refer :all]
+            [geo.core :refer [point point-x point-y]]
+            [geocoder.bing :refer :all]
+            [geocoder.provider :refer :all]))
 
 (def geocoder (make-geocoder {:key "AhiRsght2jQhqZaHpUAvXhCjvNfyWxb0Xb4EwAW81LUgvBa68FcnL9mOFDLKoQGl"}))
 
@@ -29,8 +29,8 @@
 
 (deftest test-location
   (let [location (location geocoder response)]
-    (is (= 52.54254 (:latitude location)))
-    (is (= 13.423033 (:longitude location)))))
+    (is (= 52.54254 (point-y location)))
+    (is (= 13.423033 (point-x location)))))
 
 (deftest test-street-name
   (is (= "Senefelderstraße 24" (street-name geocoder response))))
@@ -61,12 +61,12 @@
       (is (nil? (:iso-3166-1-alpha-2 country)))
       (is (= "Germany" (:name country))))
     (let [location (:location address)]
-      (is (= 52.54254 (:latitude location)))
-      (is (= 13.423033 (:longitude location))))))
+      (is (= 52.54254 (point-y location)))
+      (is (= 13.423033 (point-x location))))))
 
 (deftest test-geocode-location
-  (is (empty? (geocode-location geocoder (make-location 0 0) nil)))
-  (let [address (first (geocode-location geocoder (make-location 52.54254 13.423033) nil))]
+  (is (empty? (geocode-location geocoder (point 4326 0 0) nil)))
+  (let [address (first (geocode-location geocoder (point 4326 13.423033 52.54254) nil))]
     (is (= "Bing" (:provider address)))
     (is (= "24 Senefelderstraße" (:street-name address)))
     (is (nil? (:street-number address)))
@@ -77,8 +77,8 @@
       (is (nil? (:iso-3166-1-alpha-2 country)))
       (is (= "Germany" (:name country))))
     (let [location (:location address)]
-      (is (= 52.5424562394619 (:latitude location)))
-      (is (= 13.423220291733742 (:longitude location))))))
+      (is (= 52.5424562394619 (point-y location)))
+      (is (= 13.423220291733742 (point-x location))))))
 
 (deftest test-supports-address-geocoding?
   (is (supports-address-geocoding? geocoder)))

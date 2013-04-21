@@ -1,7 +1,7 @@
 (ns geocoder.bing
-  (:use geocoder.config
-        geocoder.location
-        geocoder.provider))
+  (:require [geo.core :refer [point point-x point-y]]
+            [geocoder.config :refer [*config*]]
+            [geocoder.provider :refer :all]))
 
 (def ^{:dynamic true} *geocoder* nil)
 
@@ -34,7 +34,8 @@
   (country [_ address]
     {:name (:country-region (:address address))})
   (location [_ address]
-    (apply make-location (:coordinates (:point address))))
+    (let [[y x] (:coordinates (:point address))]
+      (point 4326 x y)))
   (street-name [_ address]
     (:address-line (:address address)))
   (street-number [_ address]
@@ -56,7 +57,7 @@
   IGeocodeLocation
   (geocode-location [provider location options]
     (-> (make-request provider options)
-        (assoc :url (str "http://dev.virtualearth.net/REST/v1/Locations/" (to-str location)))
+        (assoc :url (str "http://dev.virtualearth.net/REST/v1/Locations/" (point-y location) "," (point-x location)))
         (fetch provider))))
 
 (alter-var-root #'*geocoder* (constantly (make-geocoder (:bing *config*))))

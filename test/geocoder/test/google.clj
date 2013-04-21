@@ -1,8 +1,8 @@
 (ns geocoder.test.google
-  (:use clojure.test
-        geocoder.google
-        geocoder.location
-        geocoder.provider))
+  (:require [clojure.test :refer :all]
+            [geo.core :refer [point point-x point-y]]
+            [geocoder.google :refer :all]
+            [geocoder.provider :refer :all]))
 
 (def address
   {:types ["street_address"],
@@ -45,8 +45,8 @@
 
 (deftest test-location
   (let [location (location *geocoder* address)]
-    (is (= 52.54258 (:latitude location)))
-    (is (= 13.42299 (:longitude location)))))
+    (is (= 52.54258 (point-y location)))
+    (is (= 13.42299 (point-x location)))))
 
 (deftest test-street-name
   (is (= "Senefelderstraße" (street-name *geocoder* address))))
@@ -77,13 +77,13 @@
       (is (= "de" (:iso-3166-1-alpha-2 country)))
       (is (= "Germany" (:name country))))
     (let [location (:location address)]
-      (is (= 52.54258 (:latitude location)))
-      (is (= 13.42299 (:longitude location))))))
+      (is (= 52.54258 (point-y location)))
+      (is (= 13.42299 (point-x location))))))
 
 (deftest test-geocode-location
   ;; TODO: Why Via Montagna Spaccata, 321, Valdagno, Province of Vicenza, Italy?
   ;; (is (empty? (geocode-location *geocoder* (make-location 0 0) nil)))
-  (let [address (first (geocode-location *geocoder* (make-location 52.54258 13.42299) nil))]
+  (let [address (first (geocode-location *geocoder* (point 4326 13.42299 52.54258) nil))]
     (is (= "Google" (:provider address)))
     (is (= "Senefelderstraße" (:street-name address)))
     (is (= "24" (:street-number address)))
@@ -94,8 +94,8 @@
       (is (= "de" (:iso-3166-1-alpha-2 country)))
       (is (= "Germany" (:name country))))
     (let [location (:location address)]
-      (is (= 52.54258 (:latitude location)))
-      (is (= 13.42299 (:longitude location))))))
+      (is (= 52.54258 (point-y location)))
+      (is (= 13.42299 (point-x location))))))
 
 (deftest test-supports-address-geocoding?
   (is (supports-address-geocoding? *geocoder*)))

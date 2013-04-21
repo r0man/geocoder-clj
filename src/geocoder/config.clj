@@ -1,5 +1,5 @@
 (ns geocoder.config
-  (:use [clojure.java.io :only (file)]))
+  (:require [clojure.java.io :refer [file]]))
 
 (def ^:dynamic *config* {})
 

@@ -6,3 +6,5 @@ pom.xml
 .lein-deps-sum
 /target
 /pom.xml.asc
+/checkouts/geo-clj
+/.lein-env

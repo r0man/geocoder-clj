@@ -8,21 +8,22 @@ Via Clojars: http://clojars.org/geocoder-clj
 
 ## Usage
 
+    (use 'geo.core)
     (use 'geocoder.core)
 
     (geocode-address "Senefelderstraße 24, 10437 Berlin")
     ;=> ({:country {:name "Germany", :iso-3166-1-alpha-2 "de"},
     ;=>   :city "Berlin",
-    ;=>   :location {:latitude 52.54258, :longitude 13.42299},
+    ;=>   :location #geo/point[4326 [13.42299 52.54258]],
     ;=>   :street-name "Senefelderstraße",
     ;=>   :street-number "24",
     ;=>   :postal-code "10437",
     ;=>   :region "Berlin"})
 
-    (geocode-location {:latitude 52.54258, :longitude 13.42299})
+    (geocode-location (point 4326 13.42299 52.54258))
     ;=> ({:country {:name "Germany", :iso-3166-1-alpha-2 "de"},
     ;=>   :city "Berlin",
-    ;=>   :location {:latitude 52.54258, :longitude 13.42299},
+    ;=>   :location #geo/point[4326 [10.451526 51.165691]],
     ;=>   :street-name "Senefelderstraße",
     ;=>   :street-number "24",
     ;=>   :postal-code "10437",
@@ -32,7 +33,7 @@ Via Clojars: http://clojars.org/geocoder-clj
     ;=> {:country {:name "Germany", :iso-3166-1-alpha-2 "de"},
     ;=>  :region {:id "16"},
     ;=>  :city "Berlin",
-    ;=>  :location {:latitude 52.516693115234375, :longitude 13.399993896484375},
+    ;=>  :location #geo/point[4326 [13.399993896484375 52.516693115234375]],
     ;=>  :area-code 0,
     ;=>  :dma-code 0,
     ;=>  :metro-code 0}

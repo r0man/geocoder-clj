@@ -1,7 +1,7 @@
 (ns geocoder.google
-  (:use [clojure.string :only (lower-case)]
-        geocoder.location
-        geocoder.provider))
+  (:require [clojure.string :refer [lower-case]]
+            [geo.core :refer [point point-x point-y]]
+            [geocoder.provider :refer :all]))
 
 (def ^{:dynamic true} *geocoder* nil)
 
@@ -37,9 +37,9 @@
     {:name (:long-name (extract address "country"))
      :iso-3166-1-alpha-2 (lower-case (:short-name (extract address "country")))})
   (location [_ address]
-    (make-location
-     (:lat (:location (:geometry address)))
-     (:lng (:location (:geometry address)))))
+    (point 4326
+           (:lng (:location (:geometry address)))
+           (:lat (:location (:geometry address)))))
   (street-name [_ address]
     (:long-name (extract address "route")))
   (street-number [_ address]
@@ -60,7 +60,7 @@
   IGeocodeLocation
   (geocode-location [provider location options]
     (-> (make-request provider options)
-        (assoc-in [:query-params :latlng] (to-str location))
+        (assoc-in [:query-params :latlng] (str (point-y location) "," (point-x location)))
         (fetch provider))))
 
 (alter-var-root #'*geocoder* (constantly (make-geocoder {})))

@@ -1,8 +1,8 @@
 (ns geocoder.geonames
-  (:use [clojure.string :only (lower-case)]
-        geocoder.config
-        geocoder.location
-        geocoder.provider))
+  (:require [clojure.string :refer [lower-case]]
+            [geo.core :refer [point point-x point-y]]
+            [geocoder.config :refer [*config*]]
+            [geocoder.provider :refer :all]))
 
 (def ^{:dynamic true} *geocoder* nil)
 
@@ -33,7 +33,7 @@
   (country [_ address]
     {:iso-3166-1-alpha-2 (lower-case (:country-code address))})
   (location [_ address]
-    (make-location (:lat address) (:lng address)))
+    (point 4326 (:lng address) (:lat address)))
   (street-name [_ address]
     (:address-line (:address address)))
   (street-number [_ address]
@@ -56,8 +56,8 @@
   (geocode-location [provider location options]
     (-> (make-request provider options)
         (assoc :url (str "http://api.geonames.org/findNearbyPostalCodesJSON"))
-        (assoc-in [:query-params :lat] (latitude location))
-        (assoc-in [:query-params :lng] (longitude location))
+        (assoc-in [:query-params :lat] (point-y location))
+        (assoc-in [:query-params :lng] (point-x location))
         (fetch provider))))
 
 (alter-var-root #'*geocoder* (constantly (make-geocoder (:geonames *config*))))
