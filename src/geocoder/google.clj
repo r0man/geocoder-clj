@@ -1,7 +1,7 @@
 (ns geocoder.google
   (:require [clojure.string :refer [lower-case]]
             [geo.core :refer [point point-x point-y]]
-            [geocoder.provider :refer [fetch-json]]
+            [geocoder.util :refer [fetch-json format-point]]
             [inflections.core :refer [underscore]]))
 
 (def request
@@ -76,6 +76,6 @@
   "Geocode a geographical location."
   [point & {:as opts}]
   (-> (update-in request [:query-params] #(merge %1 opts))
-      (assoc-in [:query-params :latlng] (str (point-y point) "," (point-x point)))
+      (assoc-in [:query-params :latlng] (format-point point))
       (fetch-json)
       :results))
