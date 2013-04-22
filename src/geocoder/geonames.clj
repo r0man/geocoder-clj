@@ -4,26 +4,6 @@
             [geo.core :refer [point point-x point-y]]
             [geocoder.util :refer [fetch-json]]))
 
-;; (defn- make-request
-;;   "Make a Geonames geocode request map."
-;;   [provider & options]
-;;   {:method :get :query-params {:username (:key provider)}})
-
-(defn- request
-  "Make a Bing geocode request map."
-  [& [opts]]
-  {:request-method :get
-   :query-params
-   (-> (dissoc opts :api-key)
-       (assoc :username (or (:api-key opts)
-                            (env :geonames-api-key))))})
-
-(defn- fetch
-  "Fetch and decode the Geonames geocode response."
-  [request]
-  (-> (fetch-json request)
-      :postal-codes))
-
 (defn city
   [address]
   (:place-name address))
@@ -43,6 +23,21 @@
 
 (defn region [address]
   (:admin-name1 address))
+
+(defn- request
+  "Make a Bing geocode request map."
+  [& [opts]]
+  {:request-method :get
+   :query-params
+   (-> (dissoc opts :api-key)
+       (assoc :username (or (:api-key opts)
+                            (env :geonames-api-key))))})
+
+(defn- fetch
+  "Fetch and decode the Geonames geocode response."
+  [request]
+  (-> (fetch-json request)
+      :postal-codes))
 
 (defn geocode-address [address & {:as opts}]
   (-> (request opts)

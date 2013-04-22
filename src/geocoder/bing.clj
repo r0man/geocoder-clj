@@ -3,23 +3,6 @@
             [geo.core :refer [point]]
             [geocoder.util :refer [fetch-json format-point]]))
 
-(defn- request
-  "Make a Bing geocode request map."
-  [& [opts]]
-  {:request-method :get
-   :url "http://dev.virtualearth.net/REST/v1/Locations"
-   :query-params
-   (-> (dissoc opts :api-key)
-       (assoc :key (or (:api-key opts)
-                       (env :bing-api-key))))})
-
-(defn- fetch
-  "Fetch and decode the Bing geocode response."
-  [request]
-  (->> (fetch-json request)
-       :resource-sets
-       (mapcat :resources)))
-
 (defn city
   "Returns the city of `address`."
   [address]
@@ -50,6 +33,23 @@
   "Returns the region of `address`."
   [address]
   (:state address))
+
+(defn- request
+  "Make a Bing geocode request map."
+  [& [opts]]
+  {:request-method :get
+   :url "http://dev.virtualearth.net/REST/v1/Locations"
+   :query-params
+   (-> (dissoc opts :api-key)
+       (assoc :key (or (:api-key opts)
+                       (env :bing-api-key))))})
+
+(defn- fetch
+  "Fetch and decode the Bing geocode response."
+  [request]
+  (->> (fetch-json request)
+       :resource-sets
+       (mapcat :resources)))
 
 (defn geocode-address
   "Geocode an address."
