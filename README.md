@@ -8,55 +8,41 @@ Via Clojars: http://clojars.org/geocoder-clj
 
 ## Usage
 
-    (use 'geo.core)
-    (use 'geocoder.core)
+### Google
 
-    (geocode-address "Senefelderstraße 24, 10437 Berlin")
-    ;=> ({:country {:name "Germany", :iso-3166-1-alpha-2 "de"},
-    ;=>   :city "Berlin",
-    ;=>   :location #geo/point[4326 [13.42299 52.54258]],
-    ;=>   :street-name "Senefelderstraße",
-    ;=>   :street-number "24",
-    ;=>   :postal-code "10437",
-    ;=>   :region "Berlin"})
+    (require '[geocoder.google :as google])
 
-    (geocode-location (point 4326 13.42299 52.54258))
-    ;=> ({:country {:name "Germany", :iso-3166-1-alpha-2 "de"},
-    ;=>   :city "Berlin",
-    ;=>   :location #geo/point[4326 [10.451526 51.165691]],
-    ;=>   :street-name "Senefelderstraße",
-    ;=>   :street-number "24",
-    ;=>   :postal-code "10437",
-    ;=>   :region "Berlin"})
+    (google/geocode-address "Senefelderstraße 24, 10437 Berlin")
 
-    (geocode-ip-address "92.229.192.11")
-    ;=> {:country {:name "Germany", :iso-3166-1-alpha-2 "de"},
-    ;=>  :region {:id "16"},
-    ;=>  :city "Berlin",
-    ;=>  :location #geo/point[4326 [13.399993896484375 52.516693115234375]],
-    ;=>  :area-code 0,
-    ;=>  :dma-code 0,
-    ;=>  :metro-code 0}
-
-## Configuration
-
-Most of the geocode services used by this library must be configured
-before being accessible.
-
-Add this to your "~/.lein/init.clj" file.
-
-    (def geocoder-config
-      {:bing {:key "BING-API-KEY"}
-       :geonames {:key "GEONAMES-API-KEY"}
-       :yahoo {:key "YAHOO-API-KEY"}})
-
-Or add this to the Leiningen "project.clj" file of your project.
-
-    (defproject my-project "1.0.0"
-      :geocoder-config
-      {:bing {:key "BING-API-KEY"}
-       :geonames {:key "GEONAMES-API-KEY"}
-       :yahoo {:key "YAHOO-API-KEY"}})
+    ;=> ({:types ("street_address"),
+    ;=>   :geometry
+    ;=>   {:viewport
+    ;=>    {:southwest {:lng 13.4216410197085, :lat 52.5412310197085},
+    ;=>     :northeast {:lng 13.4243389802915, :lat 52.5439289802915}},
+    ;=>    :location-type "ROOFTOP",
+    ;=>    :location {:lng 13.42299, :lat 52.54258}},
+    ;=>   :formatted-address "Senefelderstraße 24, 10437 Berlin, Germany",
+    ;=>   :address-components
+    ;=>   ({:types ("street_number"), :short-name "24", :long-name "24"}
+    ;=>    {:types ("route"),
+    ;=>     :short-name "Senefelderstraße",
+    ;=>     :long-name "Senefelderstraße"}
+    ;=>    {:types ("sublocality" "political"),
+    ;=>     :short-name "Prenzlauer Berg",
+    ;=>     :long-name "Prenzlauer Berg"}
+    ;=>    {:types ("sublocality" "political"),
+    ;=>     :short-name "Pankow",
+    ;=>     :long-name "Pankow"}
+    ;=>    {:types ("locality" "political"),
+    ;=>     :short-name "Berlin",
+    ;=>     :long-name "Berlin"}
+    ;=>    {:types ("administrative_area_level_1" "political"),
+    ;=>     :short-name "Berlin",
+    ;=>     :long-name "Berlin"}
+    ;=>    {:types ("country" "political"),
+    ;=>     :short-name "DE",
+    ;=>     :long-name "Germany"}
+    ;=>    {:types ("postal_code"), :short-name "10437", :long-name "10437"})})
 
 ## License
 
