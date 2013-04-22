@@ -1,10 +1,9 @@
 (ns geocoder.test.bing
   (:require [clojure.test :refer :all]
             [geo.core :refer [point point-x point-y]]
-            [geocoder.bing :refer :all]
-            [geocoder.provider :refer :all]))
+            [geocoder.bing :refer :all]))
 
-(def geocoder (make-geocoder {:key "AhiRsght2jQhqZaHpUAvXhCjvNfyWxb0Xb4EwAW81LUgvBa68FcnL9mOFDLKoQGl"}))
+(def test-key "AhiRsght2jQhqZaHpUAvXhCjvNfyWxb0Xb4EwAW81LUgvBa68FcnL9mOFDLKoQGl")
 
 (def response
   {:name "Senefelderstraße 24, 10437 Berlin",
@@ -20,71 +19,56 @@
    :entity-type "Address"})
 
 (deftest test-city
-  (is (= "Berlin" (city geocoder response))))
+  (is (= "Berlin" (city response))))
 
 (deftest test-country
-  (let [country (country geocoder response)]
+  (let [country (country response)]
     (is (nil? (:iso-3166-1-alpha-2 country)))
     (is (= "Germany" (:name country)))))
 
 (deftest test-location
-  (let [location (location geocoder response)]
+  (let [location (location response)]
     (is (= 52.54254 (point-y location)))
     (is (= 13.423033 (point-x location)))))
 
 (deftest test-street-name
-  (is (= "Senefelderstraße 24" (street-name geocoder response))))
+  (is (= "Senefelderstraße 24" (street-name response))))
 
 (deftest test-street-number
-  (is (nil? (street-number geocoder response))))
+  (is (nil? (street-number response))))
 
 (deftest test-postal-code
-  (is (= "10437" (postal-code geocoder response))))
+  (is (= "10437" (postal-code response))))
 
 (deftest test-region
-  (is (nil? (region geocoder response))))
-
-(deftest test-make-geocoder
-  (is (nil? (make-geocoder nil)))
-  (is (instance? geocoder.bing.Geocoder (make-geocoder {:key "secret"}))))
+  (is (nil? (region response))))
 
 (deftest test-geocode-address
-  (is (empty? (geocode-address geocoder "xxxxxxxxxxxxxxxxxxxxx" nil)))
-  (let [address (first (geocode-address geocoder "Senefelderstraße 24, 10437 Berlin" nil))]
-    (is (= "Bing" (:provider address)))
-    (is (= "Senefelderstraße 24" (:street-name address)))
-    (is (nil? (:street-number address)))
-    (is (= "10437" (:postal-code address)))
-    (is (= "Prenzlauer Berg" (:city address)))
-    (is (nil? (:region address)))
-    (let [country (:country address)]
+  (is (empty? (geocode-address "xxxxxxxxxxxxxxxxxxxxx" :api-key test-key)))
+  (let [address (first (geocode-address "Senefelderstraße 24, 10437 Berlin" :api-key test-key))]
+    (is (= "Senefelderstraße 24" (street-name address)))
+    (is (nil? (street-number address)))
+    (is (= "10437" (postal-code address)))
+    (is (= "Prenzlauer Berg" (city address)))
+    (is (nil? (region address)))
+    (let [country (country address)]
       (is (nil? (:iso-3166-1-alpha-2 country)))
       (is (= "Germany" (:name country))))
-    (let [location (:location address)]
+    (let [location (location address)]
       (is (= 52.54254 (point-y location)))
       (is (= 13.423033 (point-x location))))))
 
 (deftest test-geocode-location
-  (is (empty? (geocode-location geocoder (point 4326 0 0) nil)))
-  (let [address (first (geocode-location geocoder (point 4326 13.423033 52.54254) nil))]
-    (is (= "Bing" (:provider address)))
-    (is (= "24 Senefelderstraße" (:street-name address)))
-    (is (nil? (:street-number address)))
-    (is (= "10437" (:postal-code address)))
-    (is (= "Berlin" (:city address)))
-    (is (nil? (:region address)))
-    (let [country (:country address)]
+  (is (empty? (geocode-location (point 4326 0 0) :api-key test-key)))
+  (let [address (first (geocode-location (point 4326 13.423033 52.54254) :api-key test-key))]
+    (is (= "24 Senefelderstraße" (street-name address)))
+    (is (nil? (street-number address)))
+    (is (= "10437" (postal-code address)))
+    (is (= "Berlin" (city address)))
+    (is (nil? (region address)))
+    (let [country (country address)]
       (is (nil? (:iso-3166-1-alpha-2 country)))
       (is (= "Germany" (:name country))))
-    (let [location (:location address)]
+    (let [location (location address)]
       (is (= 52.5424562394619 (point-y location)))
       (is (= 13.423220291733742 (point-x location))))))
-
-(deftest test-supports-address-geocoding?
-  (is (supports-address-geocoding? geocoder)))
-
-(deftest test-supports-ip-address-geocoding?
-  (is (not (supports-ip-address-geocoding? geocoder))))
-
-(deftest test-supports-location-geocoding?
-  (is (supports-location-geocoding? geocoder)))

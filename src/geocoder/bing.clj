@@ -1,63 +1,71 @@
 (ns geocoder.bing
-  (:require [geo.core :refer [point point-x point-y]]
-            [geocoder.config :refer [*config*]]
-            [geocoder.provider :refer :all]))
+  (:require [environ.core :refer [env]]
+            [geo.core :refer [point]]
+            [geocoder.util :refer [fetch-json format-point]]))
 
-(def ^{:dynamic true} *geocoder* nil)
-
-(defrecord Geocoder [name key])
-
-(defn make-geocoder
-  "Make a Bing geocoder."
-  [attributes]
-  (if (:key attributes)
-    (Geocoder. "Bing" (:key attributes))))
-
-(defn- make-request
+(defn- request
   "Make a Bing geocode request map."
-  [provider & options]
-  {:method :get :query-params {:key (:key provider)}})
+  [& [opts]]
+  {:request-method :get
+   :url "http://dev.virtualearth.net/REST/v1/Locations"
+   :query-params
+   (-> (dissoc opts :api-key)
+       (assoc :key (or (:api-key opts)
+                       (env :bing-api-key))))})
 
 (defn- fetch
   "Fetch and decode the Bing geocode response."
-  [request provider]
-  (decode
-   (->> (fetch-json request)
-        :resource-sets
-        (mapcat :resources))
-   provider))
+  [request]
+  (->> (fetch-json request)
+       :resource-sets
+       (mapcat :resources)))
 
-(extend-type Geocoder
-  IAddress
-  (city [_ address]
-    (:locality (:address address)))
-  (country [_ address]
-    {:name (:country-region (:address address))})
-  (location [_ address]
-    (let [[y x] (:coordinates (:point address))]
-      (point 4326 x y)))
-  (street-name [_ address]
-    (:address-line (:address address)))
-  (street-number [_ address]
-    nil)
-  (postal-code [_ address]
-    (:postal-code (:address address)))
-  (region [_ address]
-    (:state address)))
+(defn city
+  "Returns the city of `address`."
+  [address]
+  (:locality (:address address)))
 
-(extend-type Geocoder
-  IGeocodeAddress
-  (geocode-address [provider address options]
-    (-> (make-request provider options)
-        (assoc :url "http://dev.virtualearth.net/REST/v1/Locations")
-        (assoc-in [:query-params :query] address)
-        (fetch provider))))
+(defn country
+  "Returns the country of `address`."
+  [address]
+  {:name (:country-region (:address address))})
 
-(extend-type Geocoder
-  IGeocodeLocation
-  (geocode-location [provider location options]
-    (-> (make-request provider options)
-        (assoc :url (str "http://dev.virtualearth.net/REST/v1/Locations/" (point-y location) "," (point-x location)))
-        (fetch provider))))
+(defn location
+  "Returns the geographical location of `address`."
+  [address]
+  (let [[y x] (:coordinates (:point address))]
+    (point 4326 x y)))
 
-(alter-var-root #'*geocoder* (constantly (make-geocoder (:bing *config*))))
+(defn street-name
+  "Returns the street name of `address`."
+  [address]
+  (:address-line (:address address)))
+
+(defn street-number
+  "Returns the street number of `address`."
+  [address]
+  nil)
+
+(defn postal-code
+  "Returns the postal code of `address`."
+  [address]
+  (:postal-code (:address address)))
+
+(defn region
+  "Returns the region of `address`."
+  [address]
+  (:state address))
+
+(defn geocode-address
+  "Geocode an address."
+  [address & {:as opts}]
+  (-> (request opts)
+      (assoc-in [:query-params :query] address)
+      (fetch)))
+
+(defn geocode-location
+  "Geocode a geographical location."
+  [location & {:as opts}]
+  (-> (request opts)
+      (update-in [:url] #(format "%s/%s" %1 (format-point location)))
+      (fetch)))

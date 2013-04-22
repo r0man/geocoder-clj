@@ -7,7 +7,7 @@
 (defn format-point
   "Format `point` in latitude, longitude order."
   [point]
-  (format "%s,%s" (point-y point)) (point-x point))
+  (format "%s,%s" (point-y point) (point-x point)))
 
 (defn fetch-json
   "Send the request, parse the hyphenized JSON body of the response."
