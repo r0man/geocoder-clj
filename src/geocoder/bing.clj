@@ -41,11 +41,6 @@
   [address]
   (:address-line (:address address)))
 
-(defn street-number
-  "Returns the street number of `address`."
-  [address]
-  nil)
-
 (defn postal-code
   "Returns the postal code of `address`."
   [address]
