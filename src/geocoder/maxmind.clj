@@ -39,6 +39,8 @@
   (. address region))
 
 (defn geocode-ip-address
+  "Geocode an internet address using one of Maxmind's GeoIP
+  databases."
   [db ip-address]
   (if-let [result (.getLocation db ip-address)]
     (if (not (=  -180.0 (. result latitude)))
