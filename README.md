@@ -8,41 +8,29 @@ Via Clojars: http://clojars.org/geocoder-clj
 
 ## Usage
 
+### Bing
+
+    (require '[geocoder.bing :as bing])
+    (bing/geocode-address "Senefelderstraße 24, 10437 Berlin")
+    (bing/geocode-location "52.54258,13.42299")
+
+### Geonames
+
+    (require '[geocoder.geonames :as geonames])
+    (geonames/geocode-address "Senefelderstraße 24, 10437 Berlin")
+    (geonames/geocode-location "52.54258,13.42299")
+
 ### Google
 
     (require '[geocoder.google :as google])
-
     (google/geocode-address "Senefelderstraße 24, 10437 Berlin")
+    (google/geocode-location "52.54258,13.42299")
 
-    ;=> ({:types ("street_address"),
-    ;=>   :geometry
-    ;=>   {:viewport
-    ;=>    {:southwest {:lng 13.4216410197085, :lat 52.5412310197085},
-    ;=>     :northeast {:lng 13.4243389802915, :lat 52.5439289802915}},
-    ;=>    :location-type "ROOFTOP",
-    ;=>    :location {:lng 13.42299, :lat 52.54258}},
-    ;=>   :formatted-address "Senefelderstraße 24, 10437 Berlin, Germany",
-    ;=>   :address-components
-    ;=>   ({:types ("street_number"), :short-name "24", :long-name "24"}
-    ;=>    {:types ("route"),
-    ;=>     :short-name "Senefelderstraße",
-    ;=>     :long-name "Senefelderstraße"}
-    ;=>    {:types ("sublocality" "political"),
-    ;=>     :short-name "Prenzlauer Berg",
-    ;=>     :long-name "Prenzlauer Berg"}
-    ;=>    {:types ("sublocality" "political"),
-    ;=>     :short-name "Pankow",
-    ;=>     :long-name "Pankow"}
-    ;=>    {:types ("locality" "political"),
-    ;=>     :short-name "Berlin",
-    ;=>     :long-name "Berlin"}
-    ;=>    {:types ("administrative_area_level_1" "political"),
-    ;=>     :short-name "Berlin",
-    ;=>     :long-name "Berlin"}
-    ;=>    {:types ("country" "political"),
-    ;=>     :short-name "DE",
-    ;=>     :long-name "Germany"}
-    ;=>    {:types ("postal_code"), :short-name "10437", :long-name "10437"})})
+### Maxmind
+
+    (require '[geocoder.maxmind :as maxmind])
+    (def db (geonames/make-db "/usr/share/GeoIP/GeoIP.dat"))
+    (maxmind/geocode-ip-address db "92.229.192.11")
 
 ## License
 
