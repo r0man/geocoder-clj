@@ -1,66 +1,81 @@
 (ns geocoder.google
   (:require [clojure.string :refer [lower-case]]
             [geo.core :refer [point point-x point-y]]
-            [geocoder.provider :refer :all]))
+            [geocoder.provider :refer [fetch-json]]
+            [inflections.core :refer [underscore]]))
 
-(def ^{:dynamic true} *geocoder* nil)
-
-(defrecord Geocoder [name])
-
-(defn make-geocoder
-  "Make a Google geocoder."
-  [attributes] (Geocoder. "Google"))
-
-(defn- make-request
-  "Make a Google geocode request map."
-  [provider & options]
-  {:method :get
+(def request
+  {:request-method :get
    :url "http://maps.google.com/maps/api/geocode/json"
    :query-params {:sensor false :language "en"}})
 
-(defn- extract
-  "Extract the address component from response."
-  [response component]
-  (first (filter #(contains? (set (:types %)) component) (:address-components response))))
+(defn- extract-type
+  "Extract the address type from response."
+  [response type]
+  (let [type (underscore (name type))]
+    (->> (:address-components response)
+         (filter #(contains? (set (:types %)) type) )
+         (first))))
 
-(defn- fetch
-  "Fetch and decode the Google geocode response."
-  [request provider]
-  (-> (fetch-json request)
-      :results (decode provider)))
+(defn long-name
+  "Extract the long name of the address type from response."
+  [response type]
+  (:long-name (extract-type response type)))
 
-(extend-type Geocoder
-  IAddress
-  (city [_ address]
-    (:long-name (extract address "locality")))
-  (country [_ address]
-    {:name (:long-name (extract address "country"))
-     :iso-3166-1-alpha-2 (lower-case (:short-name (extract address "country")))})
-  (location [_ address]
-    (point 4326
-           (:lng (:location (:geometry address)))
-           (:lat (:location (:geometry address)))))
-  (street-name [_ address]
-    (:long-name (extract address "route")))
-  (street-number [_ address]
-    (:long-name (extract address "street_number")))
-  (postal-code [_ address]
-    (:long-name (extract address "postal_code")))
-  (region [_ address]
-    (:long-name (extract address "administrative_area_level_1"))))
+(defn short-name
+  "Extract the short name of the address type from response."
+  [response type]
+  (:short-name (extract-type response type)))
 
-(extend-type Geocoder
-  IGeocodeAddress
-  (geocode-address [provider address options]
-    (-> (make-request provider options)
-        (assoc-in [:query-params :address] address)
-        (fetch provider))))
+(defn city
+  "Returns the city of `address`."
+  [address]
+  (:long-name (extract-type address :locality)))
 
-(extend-type Geocoder
-  IGeocodeLocation
-  (geocode-location [provider location options]
-    (-> (make-request provider options)
-        (assoc-in [:query-params :latlng] (str (point-y location) "," (point-x location)))
-        (fetch provider))))
+(defn country
+  "Returns the country of `address`."
+  [address]
+  {:name (long-name address :country)
+   :iso-3166-1-alpha-2 (lower-case (short-name address :country))})
 
-(alter-var-root #'*geocoder* (constantly (make-geocoder {})))
+(defn location
+  "Returns the geographical location of `address`."
+  [address]
+  (if-let [location (:location (:geometry address))]
+    (point 4326 (:lng location) (:lat location))))
+
+(defn street-name
+  "Returns the street name of `address`."
+  [address]
+  (long-name address :route))
+
+(defn street-number
+  "Returns the street number of `address`."
+  [address]
+  (long-name address :street-number))
+
+(defn postal-code
+  "Returns the postal code of `address`."
+  [address]
+  (long-name address :postal-code))
+
+(defn region
+  "Returns the region of `address`."
+  [address]
+  (long-name address :administrative-area-level-1))
+
+(defn geocode-address
+  "Geocode an address."
+  [address & {:as opts}]
+  (-> (update-in request [:query-params] #(merge %1 opts))
+      (assoc-in [:query-params :address] address)
+      (fetch-json)
+      :results))
+
+(defn geocode-location
+  "Geocode a geographical location."
+  [point & {:as opts}]
+  (-> (update-in request [:query-params] #(merge %1 opts))
+      (assoc-in [:query-params :latlng] (str (point-y point) "," (point-x point)))
+      (fetch-json)
+      :results))
