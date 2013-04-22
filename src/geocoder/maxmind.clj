@@ -8,7 +8,7 @@
   (str (System/getenv "HOME") "/.maxmind/GeoLiteCity.dat"))
 
 (defn make-db
-  "Make a Maxmind geocoder."
+  "Make a Maxmind GeoIP database."
   [& [path]]
   (let [path (or path default-path)]
     (if (.exists (file path))
