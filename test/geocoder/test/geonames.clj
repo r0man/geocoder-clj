@@ -62,4 +62,8 @@
       (is (nil? (:name country))))
     (let [location (location address)]
       (is (= 52.5161166666667 (point-y location)))
-      (is (= 13.38735 (point-x location))))))
+      (is (= 13.38735 (point-x location)))))
+  (is (= (geocode-location (point 4326 13.42299 52.54258) :api-key test-key)
+         (geocode-location "52.54258,13.42299" :api-key test-key)
+         (geocode-location {:latitude 52.54258 :longitude 13.42299} :api-key test-key)
+         (geocode-location {:lat 52.54258 :lng 13.42299} :api-key test-key))))
