@@ -1,63 +1,58 @@
 (ns geocoder.geonames
   (:require [clojure.string :refer [lower-case]]
+            [environ.core :refer [env]]
             [geo.core :refer [point point-x point-y]]
-            [geocoder.config :refer [*config*]]
-            [geocoder.provider :refer :all]))
+            [geocoder.util :refer [fetch-json]]))
 
-(def ^{:dynamic true} *geocoder* nil)
+;; (defn- make-request
+;;   "Make a Geonames geocode request map."
+;;   [provider & options]
+;;   {:method :get :query-params {:username (:key provider)}})
 
-(defrecord Geocoder [name key])
-
-(defn make-geocoder
-  "Make a Geonames geocoder."
-  [attributes]
-  (if (:key attributes)
-    (Geocoder. "Geonames" (:key attributes))))
-
-(defn- make-request
-  "Make a Geonames geocode request map."
-  [provider & options]
-  {:method :get :query-params {:username (:key provider)}})
+(defn- request
+  "Make a Bing geocode request map."
+  [& [opts]]
+  {:request-method :get
+   :query-params
+   (-> (dissoc opts :api-key)
+       (assoc :username (or (:api-key opts)
+                            (env :geonames-api-key))))})
 
 (defn- fetch
   "Fetch and decode the Geonames geocode response."
-  [request provider]
+  [request]
   (-> (fetch-json request)
-      :postal-codes
-      (decode provider)))
+      :postal-codes))
 
-(extend-type Geocoder
-  IAddress
-  (city [_ address]
-    (:place-name address))
-  (country [_ address]
-    {:iso-3166-1-alpha-2 (lower-case (:country-code address))})
-  (location [_ address]
-    (point 4326 (:lng address) (:lat address)))
-  (street-name [_ address]
-    (:address-line (:address address)))
-  (street-number [_ address]
-    nil)
-  (postal-code [_ address]
-    (:postal-code address))
-  (region [_ address]
-    (:admin-name1 address)))
+(defn city
+  [address]
+  (:place-name address))
 
-(extend-type Geocoder
-  IGeocodeAddress
-  (geocode-address [provider address options]
-    (-> (make-request provider options)
-        (assoc :url "http://api.geonames.org/postalCodeSearchJSON")
-        (assoc-in [:query-params :placename] address)
-        (fetch provider))))
+(defn country
+  [address]
+  {:iso-3166-1-alpha-2 (lower-case (:country-code address))})
 
-(extend-type Geocoder
-  IGeocodeLocation
-  (geocode-location [provider location options]
-    (-> (make-request provider options)
-        (assoc :url (str "http://api.geonames.org/findNearbyPostalCodesJSON"))
-        (assoc-in [:query-params :lat] (point-y location))
-        (assoc-in [:query-params :lng] (point-x location))
-        (fetch provider))))
+(defn location [address]
+  (point 4326 (:lng address) (:lat address)))
 
-(alter-var-root #'*geocoder* (constantly (make-geocoder (:geonames *config*))))
+(defn street-name [address]
+  (:address-line (:address address)))
+
+(defn postal-code [address]
+  (:postal-code address))
+
+(defn region [address]
+  (:admin-name1 address))
+
+(defn geocode-address [address & {:as opts}]
+  (-> (request opts)
+      (assoc :url "http://api.geonames.org/postalCodeSearchJSON")
+      (assoc-in [:query-params :placename] address)
+      (fetch)))
+
+(defn geocode-location [location & {:as opts}]
+  (-> (request opts)
+      (assoc :url (str "http://api.geonames.org/findNearbyPostalCodesJSON"))
+      (assoc-in [:query-params :lat] (point-y location))
+      (assoc-in [:query-params :lng] (point-x location))
+      (fetch)))
