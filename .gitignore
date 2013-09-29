@@ -8,3 +8,4 @@ pom.xml
 /pom.xml.asc
 /checkouts/geo-clj
 /.lein-env
+/.nrepl-port
