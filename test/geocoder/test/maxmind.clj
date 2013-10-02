@@ -12,10 +12,8 @@
   (let [result (geocode-ip-address db ip-address)]
     (is (= "Germany" (:name (:country result))))
     (is (= "de" (:iso-3166-1-alpha-2 (:country result))))
-    (is (= "16" (:region-id result)))
-    (is (= "Berlin" (:city result)))
-    (is (= 52.516693115234375 (point-y (:location result))))
-    (is (= 13.399993896484375 (point-x (:location result))))))
+    (is (number? (point-y (:location result))))
+    (is (number? (point-x (:location result))))))
 
 (deftest test-wrap-maxmind
   (let [response ((wrap-maxmind identity default-path) {:remote-addr ip-address})]
