@@ -1,4 +1,4 @@
-(ns geocoder.test.google
+(ns geocoder.google-test
   (:require [clojure.test :refer :all]
             [geo.core :refer [point point-x point-y]]
             [geocoder.google :refer :all]))

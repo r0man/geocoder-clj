@@ -1,4 +1,4 @@
-(ns geocoder.test.maxmind
+(ns geocoder.maxmind-test
   (:require [clojure.test :refer :all]
             [geo.core :refer [point-x point-y]]
             [geocoder.maxmind :refer :all]))

@@ -1,4 +1,4 @@
-(ns geocoder.test.bing
+(ns geocoder.bing-test
   (:require [clojure.test :refer :all]
             [geo.core :refer [point point-x point-y]]
             [geocoder.bing :refer :all]))

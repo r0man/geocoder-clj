@@ -1,4 +1,4 @@
-(ns geocoder.test.geonames
+(ns geocoder.geonames-test
   (:require [clojure.test :refer :all]
             [geo.core :refer [point point-x point-y]]
             [geocoder.geonames :refer :all]))
