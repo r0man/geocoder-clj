@@ -51,8 +51,8 @@
       (is (nil? (:iso-3166-1-alpha-2 country)))
       (is (= "Germany" (:name country))))
     (let [location (location address)]
-      (is (= 52.54254 (point-y location)))
-      (is (= 13.423033 (point-x location))))))
+      (is (= 52.542538 (point-y location)))
+      (is (= 13.423049 (point-x location))))))
 
 (deftest test-geocode-location
   (is (empty? (geocode-location (point 4326 0 0) :api-key test-key)))
@@ -65,8 +65,8 @@
       (is (nil? (:iso-3166-1-alpha-2 country)))
       (is (= "Germany" (:name country))))
     (let [location (location address)]
-      (is (= 52.5424562394619 (point-y location)))
-      (is (= 13.423220291733742 (point-x location)))))
+      (is (= 52.54254 (point-y location)))
+      (is (= 13.423033 (point-x location)))))
   (is (= (geocode-location (point 4326 13.42299 52.54258) :api-key test-key)
          (geocode-location "52.54258,13.42299" :api-key test-key)
          (geocode-location {:latitude 52.54258 :longitude 13.42299} :api-key test-key)
