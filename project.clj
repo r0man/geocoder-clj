@@ -6,9 +6,9 @@
   :author "Roman Scherer"
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
-  :dependencies [[clj-http "0.7.7"]
+  :dependencies [[clj-http "0.9.1"]
                  [environ "0.4.0"]
-                 [geo-clj "0.3.6"]
-                 [inflections "0.9.2"]
-                 [org.clojure/clojure "1.5.1"]
+                 [geo-clj "0.3.9"]
+                 [inflections "0.9.6"]
+                 [org.clojure/clojure "1.6.0"]
                  [org.dspace.dependencies/dspace-geoip "1.2.3"]])
