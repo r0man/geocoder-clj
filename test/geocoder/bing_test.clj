@@ -57,7 +57,7 @@
 (deftest test-geocode-location
   (is (empty? (geocode-location (point 4326 0 0) :api-key test-key)))
   (let [address (first (geocode-location (point 4326 13.423033 52.54254) :api-key test-key))]
-    (is (= "24 Senefelderstraße" (street-name address)))
+    (is (= "Senefelderstraße 24" (street-name address)))
     (is (= "10437" (postal-code address)))
     (is (= "Berlin" (city address)))
     (is (nil? (region address)))
