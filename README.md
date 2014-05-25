@@ -1,10 +1,14 @@
-# GEOCODE-CLJ [![Build Status](https://travis-ci.org/r0man/geocoder-clj.png)](https://travis-ci.org/r0man/geocoder-clj)
+# geocode-clj
+  [![Build Status](https://travis-ci.org/r0man/geocoder-clj.png)](https://travis-ci.org/r0man/geocoder-clj)
+  [![Dependencies Status](http://jarkeeper.com/r0man/geocoder-clj/status.png)](http://jarkeeper.com/r0man/geocoder-clj)
 
 A Clojure library for various geocoder services.
 
 ## Installation
 
 Via Clojars: http://clojars.org/geocoder-clj
+
+[![Current Version](https://clojars.org/geocoder-clj/latest-version.svg)](https://clojars.org/geocoder-clj)
 
 ## Usage
 
