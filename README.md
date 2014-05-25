@@ -1,4 +1,4 @@
-# geocode-clj
+# geocoder-clj
   [![Build Status](https://travis-ci.org/r0man/geocoder-clj.png)](https://travis-ci.org/r0man/geocoder-clj)
   [![Dependencies Status](http://jarkeeper.com/r0man/geocoder-clj/status.png)](http://jarkeeper.com/r0man/geocoder-clj)
 
