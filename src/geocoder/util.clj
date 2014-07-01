@@ -3,7 +3,7 @@
             [clj-http.client :as client]
             [clojure.string :refer [split]]
             [geo.core :refer [IPoint point point-x point-y]]
-            [inflections.core :refer [hyphenize-keys]]
+            [inflections.core :refer [hyphenate-keys]]
             [no.en.core :refer [parse-double]]))
 
 (defn parse-location [s]
@@ -19,11 +19,11 @@
   (format "%s,%s" (point-y point) (point-x point)))
 
 (defn fetch-json
-  "Send the request, parse the hyphenized JSON body of the response."
+  "Send the request, parse the hyphenated JSON body of the response."
   [request]
   (let [read-json #(parse-string %1 true)]
     (->> (client/request request)
-         :body read-json hyphenize-keys)))
+         :body read-json hyphenate-keys)))
 
 (extend-protocol IPoint
   String
