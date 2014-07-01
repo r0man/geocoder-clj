@@ -2,8 +2,7 @@
   :description "A Clojure library for various geocoding services."
   :url "https://github.com/r0man/geocoder-clj"
   :min-lein-version "2.0.0"
-  :lein-release {:deploy-via :clojars}
-  :author "r0man"
+  :deploy-repositories [["releases" :clojars]]
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
   :dependencies [[clj-http "0.9.2"]
