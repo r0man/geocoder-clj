@@ -62,7 +62,7 @@
 (deftest test-geocode-address
   (is (empty? (geocode-address "xxxxxxxxxxxxxxxxxxxxx")))
   (let [address (first (geocode-address "Senefelderstraße 24, 10437 Berlin"))]
-    (is (= "Senefelderstraße" (street-name address)))
+    (is (= "Senefelder Street" (street-name address)))
     (is (= "24" (street-number address)))
     (is (= "10437" (postal-code address)))
     (is (= "Berlin" (city address)))
@@ -77,7 +77,7 @@
 (deftest test-geocode-location
   (is (empty? (geocode-location (point 4326 0 0))))
   (let [address (first (geocode-location (point 4326 13.42299 52.54258)))]
-    (is (= "Senefelderstraße" (street-name address)))
+    (is (= "Senefelder Street" (street-name address)))
     (is (= "24" (street-number address)))
     (is (= "10437" (postal-code address)))
     (is (= "Berlin" (city address)))
