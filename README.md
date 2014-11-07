@@ -41,7 +41,7 @@ Via Clojars: http://clojars.org/geocoder-clj
 
 ``` clj
 (require '[geocoder.maxmind :as maxmind])
-(def db (geonames/make-db "/usr/share/GeoIP/GeoIP.dat"))
+(def db (maxmind/make-db "/usr/share/GeoIP/GeoIP.dat"))
 (maxmind/geocode-ip-address db "92.229.192.11")
 ```
 
