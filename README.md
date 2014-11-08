@@ -37,11 +37,19 @@ Via Clojars: http://clojars.org/geocoder-clj
 (google/geocode-location "52.54258,13.42299")
 ```
 
-### Maxmind
+### Maxmind GeoIP
 
 ``` clj
 (require '[geocoder.maxmind :as maxmind])
 (def db (maxmind/make-db "/usr/share/GeoIP/GeoIP.dat"))
+(maxmind/geocode-ip-address db "92.229.192.11")
+```
+
+### Maxmind GeoIP2
+
+``` clj
+(require '[geocoder.maxmind2 :as maxmind2])
+(def db (maxmind/make-db "/usr/share/GeoIP/GeoLite2-City.mmdb"))
 (maxmind/geocode-ip-address db "92.229.192.11")
 ```
 

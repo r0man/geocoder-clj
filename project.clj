@@ -9,6 +9,8 @@
                  [clj-http "1.0.1"]
                  [environ "1.0.0"]
                  [geo-clj "0.3.15"]
-                 [inflections "0.9.11"]
-                 [com.maxmind.geoip/geoip-api "1.2.14"]]
+                 [inflections "0.9.11" :exclusions [org.clojure/clojure]]
+                 [com.maxmind.geoip/geoip-api "1.2.14"]
+                 [com.maxmind.geoip2/geoip2 "2.1.0"]
+                 [gavagai "0.3.1"]] ; Java bean translation
   :plugins [[lein-ancient "0.5.5"]])
