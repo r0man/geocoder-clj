@@ -1,0 +1,64 @@
+quit
+(require '[geocoder.maxmind2 :as mx2])
+quit
+(require '[geocoder.maxmind2 :as mx2])
+quit
+(require '[geocoder.maxmind2 :as mx2])
+quit
+(require '[geocoder.maxmind2 :as mx2])
+quit
+(require '[geocoder.maxmind2 :as mx2])
+(def db (geonames/make-db))
+(def db (geocoder/make-db))
+(def db (geocoder.maxmind2/make-db))
+(mx2/geocode-ip-address db "92.229.192.11")
+quit
+(require '[geocoder.maxmind2 :as maxmind])
+(def db (maxmind/make-db))
+(maxmind/geocode-ip-address db "92.229.192.11")
+(maxmind/geocode-ip-address db "2001:4860:4860::8888")
+(maxmind/geocode-ip-address db "128.84.241.190")
+(maxmind/geocode-ip-address db "128.84.241.27")
+(prettyprint (maxmind/geocode-ip-address db "128.84.241.27"))
+(pprint (maxmind/geocode-ip-address db "128.84.241.27"))
+quit
+(require '[geocoder.maxmind2 :as maxmind])
+(def db (maxmind/make-db))
+(def address (maxmind/geocode-ip-address db "128.84.241.27"))
+(city address)
+(pprint address)
+(pprint (:location address))
+(pprint (:most-specific-subdivision address))
+(pprint (:geo-name-id (:most-specific-subdivision address)))
+(pprint (:location address))
+(:longitude (:location address))
+[ (:longitude (:location address)), (:latitude (:location address)) ]
+(:country address)
+(:name (:country address))
+(:iso-code (:country address))
+(:name (:city address))
+(:latitude (:location address))
+quit
+(require '[geocoder.maxmind2 :as maxmind])
+(def db (maxmind/make-db))
+(def address (maxmind/geocode-ip-address db "128.84.241.27"))
+(def address (maxmind/geocode-ip-address-full db "128.84.241.27"))
+(pprint address)
+quit
+(require '[geocoder.maxmind2 :as maxmind])
+(def address (maxmind/geocode-ip-address-full db "128.84.241.27"))
+(def db (maxmind/make-db))
+(def address (maxmind/geocode-ip-address-full db "128.84.241.27"))
+(pprint address)
+(def address (maxmind/geocode-ip-address db "128.84.241.27"))
+(def db (maxmind/make-db :locales [:en]))
+(def address (maxmind/geocode-ip-address db "128.84.241.27"))
+(def address (maxmind/geocode-ip-address-full db "128.84.241.27"))
+(pprint address)
+quit
+(require '[geocoder.maxmind2 :as maxmind])
+(def db (maxmind/make-db :locales [:en]))
+(def address (maxmind/geocode-ip-address-full db "128.84.241.27"))
+(def address (maxmind/geocode-ip-address db "128.84.241.27"))
+(pprint address)
+quit

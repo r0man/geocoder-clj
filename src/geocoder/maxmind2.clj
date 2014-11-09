@@ -12,11 +12,13 @@
 (def default-path
   (str (System/getenv "HOME") "/.maxmind/GeoLite2-City.mmdb"))
 
-(def ^:no-doc file-modes
+(def file-modes
+  "Get database file modes by name"
   {:memory-mapped (Reader$FileMode/valueOf "MEMORY_MAPPED")
    :memory (Reader$FileMode/valueOf "MEMORY")})
 
-(defn- ^:no-doc names-as-kw
+(defn- names-as-kw
+  "Make keywords of Java response names"
   [^AbstractNamedRecord o]
   (persistent!
    (reduce
@@ -24,7 +26,8 @@
       (assoc! acc (keyword k) v))
     (transient {}) (.getNames o))))
 
-(def ^:no-doc translator
+(def translator
+  "Translate Java data structures to map"
   (g/register-converters
     {:exclude [:class]}
     [["com.maxmind.geoip2.model.CityResponse"]
@@ -40,13 +43,6 @@
      ["com.maxmind.geoip2.record.Postal"]
      ["com.maxmind.geoip2.record.Country" :exclude [:names] :add {:names names-as-kw}]
      ["com.maxmind.geoip2.record.Traits"]]))
-
-;(defn make-db-old
-;  "Make a Maxmind GeoIP2 database."
-;  [& [path]]
-;  (let [path (or path default-path)]
-;    (if (.exists (file path))
-;      (LookupService. path))))
 
 (defn make-db
   "Returns a locator from either a String file path, a File object or an InputStream.
@@ -65,43 +61,47 @@
 (defn city
   "Returns the city of `address`."
   [address]
-  (. address city))
+  (:name (:city address)))
 
 (defn country
   "Returns the country of `address`."
   [address]
-  {:name (. address countryName)
-   :iso-3166-1-alpha-2 (if-let [code (. address countryCode)] (lower-case code))})
+  {:name (:name (:country address))
+   :iso-3166-1-alpha-2 (if-let [code (:iso-code (:country address))] (lower-case code))})
 
 (defn location
-  "Returns the location of `address`."
+  "Returns the location (WGS 84 point) of `address`."
   [address]
   (point
-   4326
-   (double (. address longitude))
-   (double (. address latitude))))
+   4326 ; Spatial Reference System for World Geodetic System 1984
+   (double (:longitude (:location address)))
+   (double (:latitude (:location address)))))
+
+(defn latitude
+  "Returns the latitude of `address`."
+  [address]
+  (:latitude (:location address)))
 
 (defn region-id
   "Returns the region id of `address`."
   [address]
-  (. address region))
+  (:geo-name-id (:most-specific-subdivision address)))
 
-;(defn geocode-ip-address-old
-;  "Geocode an internet address using one of Maxmind's GeoIP2
-;  databases."
-;  [db ip-address]
-;  (if-let [result (.getLocation db ip-address)]
-;    (if (not (=  -180.0 (. result latitude)))
-;      {:country (country result)
-;       :city (city result)
-;       :location (location result)
-;       :region-id (region-id result)})))
-
-(defn geocode-ip-address
-  "Lookup an IP given as a String in the given locator and returns a map with results"
+(defn geocode-ip-address-full
+  "Lookup an IP given as a String in the given db and returns a full results map"
   [^GeoIp2Provider db ip]
   (if-let [city (.city db (InetAddress/getByName ip))]
     (g/translate translator city {:lazy? false})))
+
+(defn geocode-ip-address
+  "Geocode an internet address using one of Maxmind's GeoIP2 databases."
+  [db ip-address]
+  (if-let [result (geocode-ip-address-full db ip-address)]
+    (if (not (= -180.0 (latitude result)))
+      {:country (country result)
+       :city (city result)
+       :location (location result)
+       :region-id (region-id result)})))
 
 (defn wrap-maxmind
   "Wrap the Maxmind GeoIP2 middleware around a Ring handler."
