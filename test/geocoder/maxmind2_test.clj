@@ -8,7 +8,8 @@
 (def db (make-db default-path))
 
 (deftest test-geocode-ip-address
-  (is (nil? (geocode-ip-address db "127.0.0.1")))
+  (is (thrown? com.maxmind.geoip2.exception.AddressNotFoundException
+               (geocode-ip-address db "127.0.0.1")))
   (let [result (geocode-ip-address db ip-address)]
     (is (= "Germany" (:name (:country result))))
     (is (= "de" (:iso-3166-1-alpha-2 (:country result))))

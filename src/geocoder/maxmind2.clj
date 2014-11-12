@@ -47,16 +47,19 @@
 (defn make-db
   "Returns a locator from either a String file path, a File object or an InputStream.
   This locator is threadsafe. Takes 3 optional arguments:
- + **:db-path** - defaults to $HOME/.maxmind/GeoLite2-City.mmdb
+ + db-path - defaults to $HOME/.maxmind/GeoLite2-City.mmdb
  + **:locales** List of recognised locales, for example [:en :fr], used for default :name
  + **:file-mode** Either *:memory-mapped* (default) or *:memory*"
-  [& {:keys [db-path locales file-mode]}]
-  (let [path (if (instance? java.io.InputStream db-path) db-path (io/file (or db-path default-path)))
+  ([]
+   make-db default-path)
+  ([db-path & {:keys [locales file-mode]}]
+    (let [path (cond (instance? java.io.InputStream db-path) db-path
+              :else (io/file (or db-path default-path)))
         builder (DatabaseReader$Builder. path)]
     (-> builder
         (cond-> locales (.locales (map name locales)))
         (cond-> file-mode (.fileMode (get file-modes file-mode)))
-        (.build))))
+        (.build)))))
 
 (defn city
   "Returns the city of `address`."
