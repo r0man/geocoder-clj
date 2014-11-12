@@ -9,3 +9,5 @@ pom.xml
 /checkouts/geo-clj
 /.lein-env
 /.nrepl-port
+
+.lein-repl-history
