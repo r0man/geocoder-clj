@@ -49,8 +49,8 @@ Via Clojars: http://clojars.org/geocoder-clj
 
 ``` clj
 (require '[geocoder.maxmind2 :as maxmind2])
-(def db (maxmind/make-db "/usr/share/GeoIP/GeoLite2-City.mmdb"))
-(maxmind/geocode-ip-address db "92.229.192.11")
+(def db (maxmind2/make-db "/usr/share/GeoIP/GeoLite2-City.mmdb"))
+(maxmind2/geocode-ip-address db "92.229.192.11")
 ```
 
 ## License
