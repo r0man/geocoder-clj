@@ -1,6 +1,7 @@
 (ns geocoder.bing-test
   (:require [clojure.test :refer :all]
             [geo.core :refer [point point-x point-y]]
+            [geocoder.utils :refer [approx=]]
             [geocoder.bing :refer :all]))
 
 (def test-key "AhiRsght2jQhqZaHpUAvXhCjvNfyWxb0Xb4EwAW81LUgvBa68FcnL9mOFDLKoQGl")
@@ -17,16 +18,6 @@
     :postal-code "10437"},
    :confidence "High",
    :entity-type "Address"})
-
-(def tolerance 0.01)
-
-(defn approx=
-  [a b]
-  (<= (- a tolerance) b (+ a tolerance)))
-
-(deftest approx=-test
-  (is (true? (approx= 1 (+ 1 tolerance))))
-  (is (false? (approx= 1 2))))
 
 (deftest test-city
   (is (= "Berlin" (city response))))
