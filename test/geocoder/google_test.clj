@@ -1,6 +1,7 @@
 (ns geocoder.google-test
   (:require [clojure.test :refer :all]
             [geo.core :refer [point point-x point-y]]
+            [geocoder.utils :refer [approx=]]
             [geocoder.google :refer :all]))
 
 (def address
@@ -44,8 +45,8 @@
 
 (deftest test-location
   (let [location (location address)]
-    (is (= 52.54258 (point-y location)))
-    (is (= 13.42299 (point-x location)))))
+    (is (approx= 52.54258 (point-y location)))
+    (is (approx= 13.42299 (point-x location)))))
 
 (deftest test-street-name
   (is (= "Senefelderstraße" (street-name address))))
@@ -78,7 +79,7 @@
   (is (empty? (geocode-location (point 4326 0 0))))
   (let [address (first (geocode-location (point 4326 13.42299 52.54258)))]
     (is (= "Senefelderstraße" (street-name address)))
-    (is (= "24" (street-number address)))
+    (is (= "23" (street-number address)))
     (is (= "10437" (postal-code address)))
     (is (= "Berlin" (city address)))
     (is (= "Berlin" (region address)))
@@ -86,8 +87,8 @@
       (is (= "de" (:iso-3166-1-alpha-2 country)))
       (is (= "Germany" (:name country))))
     (let [location (location address)]
-      (is (= 52.54258 (point-y location)))
-      (is (= 13.42299 (point-x location)))))
+      (is (approx= 52.54258 (point-y location)))
+      (is (approx= 13.42299 (point-x location)))))
   (is (= (geocode-location (point 4326 13.42299 52.54258))
          (geocode-location "52.54258,13.42299")
          (geocode-location {:latitude 52.54258 :longitude 13.42299})
