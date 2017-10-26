@@ -18,6 +18,16 @@
    :confidence "High",
    :entity-type "Address"})
 
+(def tolerance 0.01)
+
+(defn approx=
+  [a b]
+  (<= (- a tolerance) b (+ a tolerance)))
+
+(deftest approx=-test
+  (is (true? (approx= 1 (+ 1 tolerance))))
+  (is (false? (approx= 1 2))))
+
 (deftest test-city
   (is (= "Berlin" (city response))))
 
@@ -28,8 +38,8 @@
 
 (deftest test-location
   (let [location (location response)]
-    (is (= 52.54254 (point-y location)))
-    (is (= 13.423033 (point-x location)))))
+    (is (approx= 52.54254 (point-y location)))
+    (is (approx= 13.423033 (point-x location)))))
 
 (deftest test-street-name
   (is (= "Senefelderstraße 24" (street-name response))))
@@ -51,8 +61,8 @@
       (is (nil? (:iso-3166-1-alpha-2 country)))
       (is (= "Germany" (:name country))))
     (let [location (location address)]
-      (is (= 52.542538 (point-y location)))
-      (is (= 13.423049 (point-x location))))))
+      (is (approx= 13.42306 (point-x location)))
+      (is (approx= 52.54255 (point-y location))))))
 
 (deftest test-geocode-location
   (is (empty? (geocode-location (point 4326 0 0) :api-key test-key)))
@@ -65,8 +75,8 @@
       (is (nil? (:iso-3166-1-alpha-2 country)))
       (is (= "Germany" (:name country))))
     (let [location (location address)]
-      (is (= 52.54254 (point-y location)))
-      (is (= 13.423033 (point-x location)))))
+      (is (approx= 13.423033 (point-x location)))
+      (is (approx= 52.54254 (point-y location)))))
   (is (= (geocode-location (point 4326 13.42299 52.54258) :api-key test-key)
          (geocode-location "52.54258,13.42299" :api-key test-key)
          (geocode-location {:latitude 52.54258 :longitude 13.42299} :api-key test-key)
