@@ -9,3 +9,4 @@ pom.xml
 /checkouts/geo-clj
 /.lein-env
 /.nrepl-port
+/.eastwood
