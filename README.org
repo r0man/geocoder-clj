@@ -24,7 +24,7 @@
       (require '[geocoder.bing :as bing])
       (def geocoder (bing/geocoder {:api-key "MY-KEY"}))
       (bing/geocode-address geocoder "Senefelderstraße 24, 10437 Berlin")
-      (bing/geocode-location geocoder "52.54258,13.42299")
+      (bing/geocode-location geocoder {:lat 52.54258 :lng 13.42299})
     #+END_SRC
 
 *** Geonames
@@ -36,7 +36,7 @@
       (require '[geocoder.geonames :as geonames])
       (def geocoder (geonames/geocoder {:api-key "MY-KEY"}))
       (geonames/geocode-address geocoder "Senefelderstraße 24, 10437 Berlin")
-      (geonames/geocode-location geocoder "52.54258,13.42299")
+      (geonames/geocode-location geocoder {:lat 52.54258 :lng 13.42299})
     #+END_SRC
 
 *** Google
@@ -48,7 +48,7 @@
       (require '[geocoder.google :as google])
       (def geocoder (google/geocoder {:api-key "MY-KEY"}))
       (google/geocode-address geocoder "Senefelderstraße 24, 10437 Berlin")
-      (google/geocode-location geocoder "52.54258,13.42299")
+      (google/geocode-location geocoder {:lat 52.54258 :lng 13.42299})
     #+END_SRC
 
 *** Maxmind

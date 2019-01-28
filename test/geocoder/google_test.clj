@@ -1,6 +1,5 @@
 (ns geocoder.google-test
   (:require [clojure.test :refer :all]
-            [geo.core :refer [point point-x point-y]]
             [geocoder.google :as google :refer :all]
             [geocoder.util :as util]
             [geocoder.utils :refer [approx=]]))
@@ -87,8 +86,8 @@
 
 (deftest test-location
   (let [location (location address)]
-    (is (approx= 52.54258 (point-y location)))
-    (is (approx= 13.42299 (point-x location)))))
+    (is (approx= 52.54258 (:lat location)))
+    (is (approx= 13.42299 (:lng location)))))
 
 (deftest test-street-name
   (is (= "Senefelderstraße" (street-name address))))
@@ -117,15 +116,15 @@
           (is (= "de" (:iso-3166-1-alpha-2 country)))
           (is (= "Germany" (:name country))))
         (let [location (location address)]
-          (is (= 52.54258 (point-y location)))
-          (is (= 13.42299 (point-x location))))))))
+          (is (= 52.54258 (:lat location)))
+          (is (= 13.42299 (:lng location))))))))
 
 (deftest test-geocode-location
   (let [geocoder (google/geocoder {:api-key api-key})]
     (with-redefs [util/fetch-json (constantly geocoder-result-zero)]
-      (is (empty? (geocode-location geocoder (point 4326 0 0)))))
+      (is (empty? (geocode-location geocoder {:lat 0 :lng 0}))))
     (with-redefs [util/fetch-json (constantly geocode-address-response-ok)]
-      (let [[address] (geocode-location geocoder (point 4326 13.42299 52.54258))]
+      (let [[address] (geocode-location geocoder {:lat 52.54258 :lng 13.42299})]
         (is (= "Senefelderstraße" (street-name address)))
         (is (= "24" (street-number address)))
         (is (= "10437" (postal-code address)))
@@ -135,18 +134,5 @@
           (is (= "de" (:iso-3166-1-alpha-2 country)))
           (is (= "Germany" (:name country))))
         (let [location (location address)]
-          (is (approx= 52.54258 (point-y location)))
-          (is (approx= 13.42299 (point-x location))))))))
-
-(deftest test-geocode-location-input
-  (let [geocoder (google/geocoder {:api-key api-key})]
-    (with-redefs [util/fetch-json
-                  (fn [request]
-                    (is (= "52.54258,13.42299"
-                           (-> request :query-params :latlng)))
-                    geocode-address-response-ok)]
-      (doseq [location [(point 4326 13.42299 52.54258)
-                        "52.54258,13.42299"
-                        {:latitude 52.54258 :longitude 13.42299}
-                        {:lat 52.54258 :lng 13.42299}]]
-        (geocode-location geocoder "52.54258,13.42299")))))
+          (is (approx= 52.54258 (:lat location)))
+          (is (approx= 13.42299 (:lng location))))))))

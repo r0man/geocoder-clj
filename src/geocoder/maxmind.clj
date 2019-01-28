@@ -3,7 +3,6 @@
            [com.maxmind.geoip2.exception AddressNotFoundException]
            [java.net InetAddress])
   (:require [clojure.string :refer [lower-case]]
-            [geo.core :refer [point point-x point-y]]
             [clojure.java.io :as io]
             [clojure.string :as str]))
 
@@ -33,7 +32,8 @@
   "Returns the location of `address`."
   [result]
   (when-let [location (.getLocation result)]
-    (point 4326 (double (.getLongitude location)) (double (.getLatitude location)))))
+    {:lng (double (.getLongitude location))
+     :lat (double (.getLatitude location)) }))
 
 (defn region-id
   "Returns the region id of `address`."

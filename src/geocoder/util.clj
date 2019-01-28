@@ -2,7 +2,6 @@
   (:require [cheshire.core :refer [parse-string]]
             [clj-http.client :as client]
             [clojure.string :refer [split]]
-            [geo.core :refer [IPoint point point-x point-y]]
             [inflections.core :refer [hyphenate-keys]]
             [no.en.core :refer [parse-double]]))
 
@@ -11,12 +10,12 @@
                    (map parse-double)
                    (remove nil?))]
     (if (= 2 (count parts))
-      (apply point 4326 (reverse parts)))))
+      (zipmap [:lat :lng] parts ))))
 
-(defn format-point
-  "Format `point` in latitude, longitude order."
-  [point]
-  (format "%s,%s" (point-y point) (point-x point)))
+(defn format-location
+  "Format `location` in latitude, longitude order."
+  [location]
+  (format "%s,%s" (:lat location) (:lng location)))
 
 (defn fetch-json
   "Send the request, parse the hyphenated JSON body of the response."
@@ -27,17 +26,3 @@
           request)
          (client/request)
          :body read-json hyphenate-keys)))
-
-(extend-protocol IPoint
-  String
-  (point-x [s]
-    (point-x (parse-location s)))
-  (point-y [s]
-    (point-y (parse-location s)))
-  clojure.lang.IPersistentMap
-  (point-x [m]
-    (or (:longitude m)
-        (:lng m)))
-  (point-y [m]
-    (or (:latitude m)
-        (:lat m))))

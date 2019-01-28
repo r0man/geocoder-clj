@@ -1,6 +1,5 @@
 (ns geocoder.bing
-  (:require [geo.core :refer [point]]
-            [geocoder.util :refer [fetch-json format-point]]))
+  (:require [geocoder.util :refer [fetch-json format-location]]))
 
 (defn city
   "Returns the city of `address`."
@@ -16,7 +15,7 @@
   "Returns the geographical location of `address`."
   [address]
   (let [[y x] (:coordinates (:point address))]
-    (point 4326 x y)))
+    {:lat y :lng x}))
 
 (defn street-name
   "Returns the street name of `address`."
@@ -59,7 +58,7 @@
   "Geocode a geographical location."
   [geocoder location & {:as opts}]
   (-> (request geocoder opts)
-      (update-in [:url] #(format "%s/%s" %1 (format-point location)))
+      (update-in [:url] #(format "%s/%s" %1 (format-location location)))
       (fetch)))
 
 (defn geocoder

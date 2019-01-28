@@ -1,6 +1,5 @@
 (ns geocoder.geonames
   (:require [clojure.string :as str]
-            [geo.core :as geo]
             [geocoder.util :as util]))
 
 (defn city
@@ -12,7 +11,7 @@
   {:iso-3166-1-alpha-2 (str/lower-case (:country-code address))})
 
 (defn location [address]
-  (geo/point 4326 (:lng address) (:lat address)))
+  (select-keys address [:lat :lng]))
 
 (defn street-name [address]
   (:address-line (:address address)))
@@ -45,8 +44,8 @@
 (defn geocode-location [geocoder location & [opts]]
   (-> (request geocoder opts)
       (assoc :url (str "http://api.geonames.org/findNearbyPostalCodesJSON"))
-      (assoc-in [:query-params :lat] (geo/point-y location))
-      (assoc-in [:query-params :lng] (geo/point-x location))
+      (assoc-in [:query-params :lat] (:lat location))
+      (assoc-in [:query-params :lng] (:lng location))
       (fetch)))
 
 (defn geocoder

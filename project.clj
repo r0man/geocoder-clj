@@ -5,11 +5,14 @@
   :deploy-repositories [["releases" :clojars]]
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
-  :dependencies [[clj-http "3.9.1"]
+  :dependencies [[cheshire "5.8.1"]
+                 [clj-http "3.9.1"]
                  [com.maxmind.geoip2/geoip2 "2.12.0"]
-                 [geo-clj "0.6.3"]
                  [inflections "0.13.1"]
                  [org.clojure/clojure "1.10.0"]]
+  :profiles {:dev {:dependencies [[clj-http "3.9.1"]
+                                  [org.clojure/test.check "0.9.0"]
+                                  [spec-provider "0.4.14"]]}}
   :plugins [[jonase/eastwood "0.3.5"]]
   :aliases {"ci" ["do" ["test"] ["lint"]]
             "lint" ["do"  ["eastwood"]]})

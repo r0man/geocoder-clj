@@ -1,6 +1,5 @@
 (ns geocoder.geonames-test
   (:require [clojure.test :refer :all]
-            [geo.core :refer [point point-x point-y]]
             [geocoder.utils :refer [approx=]]
             [geocoder.geonames :as geocoder]))
 
@@ -25,8 +24,8 @@
 
 (deftest test-location
   (let [location (geocoder/location response)]
-    (is (= 52.5161166666667 (point-y location)))
-    (is (= 13.38735 (point-x location)))))
+    (is (= 52.5161166666667 (:lat location)))
+    (is (= 13.38735 (:lng location)))))
 
 (deftest test-street-name
   (is (nil? (geocoder/street-name response))))
@@ -49,13 +48,13 @@
         (is (= "de" (:iso-3166-1-alpha-2 country)))
         (is (nil? (:name country))))
       (let [location (geocoder/location address)]
-        (is (approx= 52.5161166666667 (point-y location)))
-        (is (approx= 13.319519141740923 (point-x location)))))))
+        (is (approx= 52.5161166666667 (:lat location)))
+        (is (approx= 13.319519141740923 (:lng location)))))))
 
 (deftest test-geocode-location
   (let [geocoder (geocoder/geocoder {:api-key test-key})]
-    (is (empty? (geocoder/geocode-location geocoder (point 4326 0 0))))
-    (let [address (first (geocoder/geocode-location geocoder (point 4326 13.38735 52.5161166666667)))]
+    (is (empty? (geocoder/geocode-location geocoder {:lat 0 :lng 0})))
+    (let [address (first (geocoder/geocode-location geocoder {:lng 13.38735 :lat 52.5161166666667}))]
       (is (nil? (geocoder/street-name address)))
       (is (= "10117" (geocoder/postal-code address)))
       (is (= "Berlin" (geocoder/city address)))
@@ -64,9 +63,5 @@
         (is (= "de" (:iso-3166-1-alpha-2 country)))
         (is (nil? (:name country))))
       (let [location (geocoder/location address)]
-        (is (approx= 52.5161166666667 (point-y location)))
-        (is (approx= 13.38735 (point-x location)))))
-    (is (= (geocoder/geocode-location geocoder (point 4326 13.42299 52.54258))
-           (geocoder/geocode-location geocoder "52.54258,13.42299")
-           (geocoder/geocode-location geocoder {:latitude 52.54258 :longitude 13.42299})
-           (geocoder/geocode-location geocoder {:lat 52.54258 :lng 13.42299})))))
+        (is (approx= 52.5161166666667 (:lat location)))
+        (is (approx= 13.38735 (:lng location)))))))
