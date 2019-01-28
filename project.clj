@@ -1,4 +1,4 @@
-(defproject geocoder-clj "0.3.5-SNAPSHOT"
+(defproject geocoder-clj "0.3.5"
   :description "A Clojure library for various geocoding services."
   :url "https://github.com/r0man/geocoder-clj"
   :min-lein-version "2.0.0"
