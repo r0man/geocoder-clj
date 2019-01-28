@@ -42,7 +42,7 @@
            ::plus-code]))
 
 (s/def ::results
-  (s/coll-of ::result :gen-max 3))
+  (s/nilable (s/coll-of ::result :gen-max 3)))
 
 ;; Geocoder
 
@@ -123,7 +123,8 @@
     (-> (update-in geocoder [:query-params] #(merge %1 opts))
         (assoc-in [:query-params :address] address)
         (request)
-        :results)))
+        :results
+        not-empty)))
 
 (s/fdef geocode-address
   :args (s/cat :geocoder ::geocoder :address string?)
@@ -135,7 +136,8 @@
   (-> (update-in geocoder [:query-params] #(merge %1 opts))
       (assoc-in [:query-params :latlng] (format-location location))
       (request)
-      :results))
+      :results
+      not-empty))
 
 (s/fdef geocode-location
   :args (s/cat :geocoder ::geocoder :location ::location)

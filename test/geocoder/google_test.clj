@@ -103,9 +103,9 @@
 
 (deftest test-geocode-address
   (let [geocoder (google/geocoder {:api-key api-key})]
-    (is (empty? (geocode-address geocoder "")))
+    (is (nil? (geocode-address geocoder "")))
     (with-redefs [util/fetch-json (constantly geocoder-result-zero)]
-      (is (empty? (geocode-address geocoder "xxxxxxxxxxxxxxxxxxxxx"))))
+      (is (nil? (geocode-address geocoder "xxxxxxxxxxxxxxxxxxxxx"))))
     (with-redefs [util/fetch-json (constantly geocode-address-response-ok)]
       (let [[address] (geocode-address geocoder "Senefelderstraße 24, 10437 Berlin")]
         (is (= "Senefelderstraße" (street-name address)))
@@ -123,7 +123,7 @@
 (deftest test-geocode-location
   (let [geocoder (google/geocoder {:api-key api-key})]
     (with-redefs [util/fetch-json (constantly geocoder-result-zero)]
-      (is (empty? (geocode-location geocoder {:lat 0 :lng 0}))))
+      (is (nil? (geocode-location geocoder {:lat 0 :lng 0}))))
     (with-redefs [util/fetch-json (constantly geocode-address-response-ok)]
       (let [[address] (geocode-location geocoder {:lat 52.54258 :lng 13.42299})]
         (is (= "Senefelderstraße" (street-name address)))
