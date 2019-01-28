@@ -1,8 +1,12 @@
 (ns geocoder.google-test
   (:require [clojure.test :refer :all]
             [geo.core :refer [point point-x point-y]]
-            [geocoder.utils :refer [approx=]]
-            [geocoder.google :refer :all]))
+            [geocoder.google :as google :refer :all]
+            [geocoder.util :as util]
+            [geocoder.utils :refer [approx=]]))
+
+(def api-key
+  "MY-API-KEY")
 
 (def address
   {:types ["street_address"],
@@ -35,6 +39,44 @@
      :types ["country" "political"]}
     {:long-name "10437", :short-name "10437", :types ["postal_code"]}]})
 
+(def geocode-address-response-ok
+  {:results
+   [{:address-components
+     [{:long-name "24", :short-name "24", :types ["street_number"]}
+      {:long-name "Senefelderstraße",
+       :short-name "Senefelderstraße",
+       :types ["route"]}
+      {:long-name "Bezirk Pankow",
+       :short-name "Bezirk Pankow",
+       :types ["political" "sublocality" "sublocality_level_1"]}
+      {:long-name "Berlin",
+       :short-name "Berlin",
+       :types ["locality" "political"]}
+      {:long-name "Berlin",
+       :short-name "Berlin",
+       :types ["administrative_area_level_1" "political"]}
+      {:long-name "Germany",
+       :short-name "DE",
+       :types ["country" "political"]}
+      {:long-name "10437", :short-name "10437", :types ["postal_code"]}],
+     :formatted-address "Senefelderstraße 24, 10437 Berlin, Germany",
+     :geometry
+     {:location {:lat 52.54258, :lng 13.42299},
+      :location-type "ROOFTOP",
+      :viewport
+      {:northeast {:lat 52.5439289802915, :lng 13.4243389802915},
+       :southwest {:lat 52.5412310197085, :lng 13.4216410197085}}},
+     :partial-match true,
+     :place-id "ChIJf9QNQf5NqEcRVo31O1xb20c",
+     :plus-code
+     {:compound-code "GCVF+25 Berlin, Germany",
+      :global-code "9F4MGCVF+25"},
+     :types ["street_address"]}],
+   :status "OK"})
+
+(def geocoder-result-zero
+  {:results [] :status "ZERO_RESULTS"})
+
 (deftest test-city
   (is (= "Berlin" (city address))))
 
@@ -61,35 +103,50 @@
   (is (= "Berlin" (region address))))
 
 (deftest test-geocode-address
-  (is (empty? (geocode-address "xxxxxxxxxxxxxxxxxxxxx")))
-  (let [address (first (geocode-address "Senefelderstraße 24, 10437 Berlin"))]
-    (is (= "Senefelderstraße" (street-name address)))
-    (is (= "24" (street-number address)))
-    (is (= "10437" (postal-code address)))
-    (is (= "Berlin" (city address)))
-    (is (= "Berlin" (region address)))
-    (let [country (country address)]
-      (is (= "de" (:iso-3166-1-alpha-2 country)))
-      (is (= "Germany" (:name country))))
-    (let [location (location address)]
-      (is (= 52.54258 (point-y location)))
-      (is (= 13.42299 (point-x location))))))
+  (let [geocoder (google/geocoder {:api-key api-key})]
+    (with-redefs [util/fetch-json (constantly geocoder-result-zero)]
+      (is (empty? (geocode-address geocoder "xxxxxxxxxxxxxxxxxxxxx"))))
+    (with-redefs [util/fetch-json (constantly geocode-address-response-ok)]
+      (let [[address] (geocode-address geocoder "Senefelderstraße 24, 10437 Berlin")]
+        (is (= "Senefelderstraße" (street-name address)))
+        (is (= "24" (street-number address)))
+        (is (= "10437" (postal-code address)))
+        (is (= "Berlin" (city address)))
+        (is (= "Berlin" (region address)))
+        (let [country (country address)]
+          (is (= "de" (:iso-3166-1-alpha-2 country)))
+          (is (= "Germany" (:name country))))
+        (let [location (location address)]
+          (is (= 52.54258 (point-y location)))
+          (is (= 13.42299 (point-x location))))))))
 
 (deftest test-geocode-location
-  (is (empty? (geocode-location (point 4326 0 0))))
-  (let [address (first (geocode-location (point 4326 13.42299 52.54258)))]
-    (is (= "Senefelderstraße" (street-name address)))
-    (is (= "23" (street-number address)))
-    (is (= "10437" (postal-code address)))
-    (is (= "Berlin" (city address)))
-    (is (= "Berlin" (region address)))
-    (let [country (country address)]
-      (is (= "de" (:iso-3166-1-alpha-2 country)))
-      (is (= "Germany" (:name country))))
-    (let [location (location address)]
-      (is (approx= 52.54258 (point-y location)))
-      (is (approx= 13.42299 (point-x location)))))
-  (is (= (geocode-location (point 4326 13.42299 52.54258))
-         (geocode-location "52.54258,13.42299")
-         (geocode-location {:latitude 52.54258 :longitude 13.42299})
-         (geocode-location {:lat 52.54258 :lng 13.42299}))))
+  (let [geocoder (google/geocoder {:api-key api-key})]
+    (with-redefs [util/fetch-json (constantly geocoder-result-zero)]
+      (is (empty? (geocode-location geocoder (point 4326 0 0)))))
+    (with-redefs [util/fetch-json (constantly geocode-address-response-ok)]
+      (let [[address] (geocode-location geocoder (point 4326 13.42299 52.54258))]
+        (is (= "Senefelderstraße" (street-name address)))
+        (is (= "24" (street-number address)))
+        (is (= "10437" (postal-code address)))
+        (is (= "Berlin" (city address)))
+        (is (= "Berlin" (region address)))
+        (let [country (country address)]
+          (is (= "de" (:iso-3166-1-alpha-2 country)))
+          (is (= "Germany" (:name country))))
+        (let [location (location address)]
+          (is (approx= 52.54258 (point-y location)))
+          (is (approx= 13.42299 (point-x location))))))))
+
+(deftest test-geocode-location-input
+  (let [geocoder (google/geocoder {:api-key api-key})]
+    (with-redefs [util/fetch-json
+                  (fn [request]
+                    (is (= "52.54258,13.42299"
+                           (-> request :query-params :latlng)))
+                    geocode-address-response-ok)]
+      (doseq [location [(point 4326 13.42299 52.54258)
+                        "52.54258,13.42299"
+                        {:latitude 52.54258 :longitude 13.42299}
+                        {:lat 52.54258 :lng 13.42299}]]
+        (geocode-location geocoder "52.54258,13.42299")))))

@@ -1,6 +1,5 @@
 (ns geocoder.bing
-  (:require [environ.core :refer [env]]
-            [geo.core :refer [point]]
+  (:require [geo.core :refer [point]]
             [geocoder.util :refer [fetch-json format-point]]))
 
 (defn city
@@ -36,13 +35,11 @@
 
 (defn- request
   "Make a Bing geocode request map."
-  [& [opts]]
+  [geocoder & [opts]]
   {:request-method :get
    :url "http://dev.virtualearth.net/REST/v1/Locations"
    :query-params
-   (-> (dissoc opts :api-key)
-       (assoc :key (or (:api-key opts)
-                       (env :bing-api-key))))})
+   (assoc opts :key (:api-key geocoder))})
 
 (defn- fetch
   "Fetch and decode the Bing geocode response."
@@ -53,14 +50,19 @@
 
 (defn geocode-address
   "Geocode an address."
-  [address & {:as opts}]
-  (-> (request opts)
+  [geocoder address & {:as opts}]
+  (-> (request geocoder opts)
       (assoc-in [:query-params :query] address)
       (fetch)))
 
 (defn geocode-location
   "Geocode a geographical location."
-  [location & {:as opts}]
-  (-> (request opts)
+  [geocoder location & {:as opts}]
+  (-> (request geocoder opts)
       (update-in [:url] #(format "%s/%s" %1 (format-point location)))
       (fetch)))
+
+(defn geocoder
+  "Returns a new Bing geocoder."
+  [& [{:keys [api-key]}]]
+  {:api-key api-key})

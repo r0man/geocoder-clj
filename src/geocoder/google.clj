@@ -1,13 +1,8 @@
 (ns geocoder.google
-  (:require [clojure.string :refer [lower-case]]
+  (:require [clojure.string :as str]
             [geo.core :refer [point point-x point-y]]
             [geocoder.util :refer [fetch-json format-point]]
             [inflections.core :refer [underscore]]))
-
-(def request
-  {:request-method :get
-   :url "http://maps.google.com/maps/api/geocode/json"
-   :query-params {:sensor false :language "en"}})
 
 (defn- extract-type
   "Extract the address type from response."
@@ -36,7 +31,7 @@
   "Returns the country of `address`."
   [address]
   {:name (long-name address :country)
-   :iso-3166-1-alpha-2 (lower-case (short-name address :country))})
+   :iso-3166-1-alpha-2 (str/lower-case (short-name address :country))})
 
 (defn location
   "Returns the geographical location of `address`."
@@ -64,18 +59,34 @@
   [address]
   (long-name address :administrative-area-level-1))
 
+(defn- request [request]
+  (let [{:keys [error-message status] :as response} (fetch-json request)]
+    (if (contains? #{"OK" "ZERO_RESULTS"} status)
+      response
+      (throw (ex-info (str "Geocode request failed: " error-message) response)))))
+
 (defn geocode-address
   "Geocode an address."
-  [address & {:as opts}]
-  (-> (update-in request [:query-params] #(merge %1 opts))
+  [geocoder address & {:as opts}]
+  (-> (update-in geocoder [:query-params] #(merge %1 opts))
       (assoc-in [:query-params :address] address)
-      (fetch-json)
+      (request)
       :results))
 
 (defn geocode-location
   "Geocode a geographical location."
-  [point & {:as opts}]
-  (-> (update-in request [:query-params] #(merge %1 opts))
+  [geocoder point & {:as opts}]
+  (-> (update-in geocoder [:query-params] #(merge %1 opts))
       (assoc-in [:query-params :latlng] (format-point point))
-      (fetch-json)
+      (request)
       :results))
+
+(defn geocoder
+  "Returns a new Google Maps geocoder."
+  [& [{:keys [api-key language sensor?]}]]
+  {:request-method :get
+   :url "https://maps.google.com/maps/api/geocode/json"
+   :query-params
+   {:key api-key
+    :language (or language "en")
+    :sensor (or sensor? false)}})

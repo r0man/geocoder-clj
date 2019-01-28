@@ -1,8 +1,7 @@
 (ns geocoder.geonames
-  (:require [clojure.string :refer [lower-case]]
-            [environ.core :refer [env]]
-            [geo.core :refer [point point-x point-y]]
-            [geocoder.util :refer [fetch-json]]))
+  (:require [clojure.string :as str]
+            [geo.core :as geo]
+            [geocoder.util :as util]))
 
 (defn city
   [address]
@@ -10,10 +9,10 @@
 
 (defn country
   [address]
-  {:iso-3166-1-alpha-2 (lower-case (:country-code address))})
+  {:iso-3166-1-alpha-2 (str/lower-case (:country-code address))})
 
 (defn location [address]
-  (point 4326 (:lng address) (:lat address)))
+  (geo/point 4326 (:lng address) (:lat address)))
 
 (defn street-name [address]
   (:address-line (:address address)))
@@ -26,28 +25,31 @@
 
 (defn- request
   "Make a Bing geocode request map."
-  [& [opts]]
+  [geocoder & [opts]]
   {:request-method :get
    :query-params
-   (-> (dissoc opts :api-key)
-       (assoc :username (or (:api-key opts)
-                            (env :geonames-api-key))))})
+   (assoc opts :username (:api-key geocoder))})
 
 (defn- fetch
   "Fetch and decode the Geonames geocode response."
   [request]
-  (-> (fetch-json request)
+  (-> (util/fetch-json request)
       :postal-codes))
 
-(defn geocode-address [address & {:as opts}]
-  (-> (request opts)
+(defn geocode-address [geocoder address & [opts]]
+  (-> (request geocoder opts)
       (assoc :url "http://api.geonames.org/postalCodeSearchJSON")
       (assoc-in [:query-params :placename] address)
       (fetch)))
 
-(defn geocode-location [location & {:as opts}]
-  (-> (request opts)
+(defn geocode-location [geocoder location & [opts]]
+  (-> (request geocoder opts)
       (assoc :url (str "http://api.geonames.org/findNearbyPostalCodesJSON"))
-      (assoc-in [:query-params :lat] (point-y location))
-      (assoc-in [:query-params :lng] (point-x location))
+      (assoc-in [:query-params :lat] (geo/point-y location))
+      (assoc-in [:query-params :lng] (geo/point-x location))
       (fetch)))
+
+(defn geocoder
+  "Returns a new Geonames geocoder."
+  [& [{:keys [api-key]}]]
+  {:api-key api-key})
