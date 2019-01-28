@@ -1,8 +1,11 @@
 (ns geocoder.google-test
   (:require [clojure.test :refer :all]
+            [clojure.spec.test.alpha :as stest]
             [geocoder.google :as google :refer :all]
             [geocoder.util :as util]
             [geocoder.utils :refer [approx=]]))
+
+(stest/instrument)
 
 (def api-key
   "MY-API-KEY")

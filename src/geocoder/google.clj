@@ -118,7 +118,7 @@
 
 (defn geocode-address
   "Geocode an address."
-  [geocoder address & {:as opts}]
+  [geocoder address & [opts]]
   (when-not (str/blank? address)
     (-> (update-in geocoder [:query-params] #(merge %1 opts))
         (assoc-in [:query-params :address] address)
@@ -127,12 +127,14 @@
         not-empty)))
 
 (s/fdef geocode-address
-  :args (s/cat :geocoder ::geocoder :address string?)
+  :args (s/cat :geocoder ::geocoder
+               :address string?
+               :opts (s/? (s/nilable map?)))
   :ret ::results)
 
 (defn geocode-location
   "Geocode a geographical location."
-  [geocoder location & {:as opts}]
+  [geocoder location & [opts]]
   (-> (update-in geocoder [:query-params] #(merge %1 opts))
       (assoc-in [:query-params :latlng] (format-location location))
       (request)
@@ -140,7 +142,9 @@
       not-empty))
 
 (s/fdef geocode-location
-  :args (s/cat :geocoder ::geocoder :location ::location)
+  :args (s/cat :geocoder ::geocoder
+               :location ::location
+               :opts (s/? (s/nilable map?)))
   :ret ::results)
 
 (defn geocoder
