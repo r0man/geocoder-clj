@@ -103,6 +103,7 @@
 
 (deftest test-geocode-address
   (let [geocoder (google/geocoder {:api-key api-key})]
+    (is (empty? (geocode-address geocoder "")))
     (with-redefs [util/fetch-json (constantly geocoder-result-zero)]
       (is (empty? (geocode-address geocoder "xxxxxxxxxxxxxxxxxxxxx"))))
     (with-redefs [util/fetch-json (constantly geocode-address-response-ok)]

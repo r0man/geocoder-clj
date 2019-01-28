@@ -33,12 +33,13 @@
 (s/def ::result
   (s/keys :req-un
           [::address-components
-           ::formatted-address
-           ::geometry
-           ::partial-match
+           ::formatted-address]
+          :opt-un
+          [::geometry
            ::place-id
-           ::plus-code
-           ::types]))
+           ::types
+           ::partial-match
+           ::plus-code]))
 
 (s/def ::results
   (s/coll-of ::result :gen-max 3))
@@ -118,10 +119,11 @@
 (defn geocode-address
   "Geocode an address."
   [geocoder address & {:as opts}]
-  (-> (update-in geocoder [:query-params] #(merge %1 opts))
-      (assoc-in [:query-params :address] address)
-      (request)
-      :results))
+  (when-not (str/blank? address)
+    (-> (update-in geocoder [:query-params] #(merge %1 opts))
+        (assoc-in [:query-params :address] address)
+        (request)
+        :results)))
 
 (s/fdef geocode-address
   :args (s/cat :geocoder ::geocoder :address string?)
