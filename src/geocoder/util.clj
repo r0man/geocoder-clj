@@ -17,12 +17,23 @@
   [location]
   (format "%s,%s" (:lat location) (:lng location)))
 
+(defn- read-body [body]
+  (cond
+    (string? body)
+    (try (parse-string body keyword)
+         (catch Exception _ body))
+    :else body))
+
 (defn fetch-json
   "Send the request, parse the hyphenated JSON body of the response."
   [request]
-  (let [read-json #(parse-string %1 keyword)]
-    (->> (merge
-          {:throw-exceptions true}
-          request)
-         (client/request)
-         :body read-json hyphenate-keys)))
+  (try (->> (merge
+             {:as :auto
+              :throw-exceptions true
+              :coerce :always}
+             request)
+            (client/request)
+            :body read-body hyphenate-keys)
+       (catch Exception e
+         (throw (ex-info (str "Geocode request failed: " (.getMessage e))
+                         (hyphenate-keys (ex-data e)))))))
