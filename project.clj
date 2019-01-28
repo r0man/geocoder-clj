@@ -7,7 +7,6 @@
             :url "http://www.eclipse.org/legal/epl-v10.html"}
   :dependencies [[clj-http "3.9.1"]
                  [com.maxmind.geoip2/geoip2 "2.12.0"]
-                 [environ "1.0.2"]
                  [geo-clj "0.6.3"]
                  [inflections "0.13.1"]
                  [org.clojure/clojure "1.10.0"]]
