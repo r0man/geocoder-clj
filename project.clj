@@ -5,9 +5,12 @@
   :deploy-repositories [["releases" :clojars]]
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
-  :dependencies [[clj-http "0.9.2"]
-                 [environ "0.5.0"]
-                 [geo-clj "0.3.12"]
-                 [inflections "0.9.9"]
-                 [org.clojure/clojure "1.6.0"]
-                 [org.dspace.dependencies/dspace-geoip "1.2.3"]])
+  :dependencies [[clj-http "3.9.1"]
+                 [com.maxmind.geoip2/geoip2 "2.12.0"]
+                 [environ "1.0.2"]
+                 [geo-clj "0.6.3"]
+                 [inflections "0.13.1"]
+                 [org.clojure/clojure "1.10.0"]]
+  :plugins [[jonase/eastwood "0.3.5"]]
+  :aliases {"ci" ["do" ["test"] ["lint"]]
+            "lint" ["do"  ["eastwood"]]})

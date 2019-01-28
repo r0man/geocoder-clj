@@ -1,0 +1,72 @@
+* geocoder-clj
+  :PROPERTIES:
+  :CUSTOM_ID: geocoder-clj
+  :END:
+
+  [[https://clojars.org/geocoder-clj][https://img.shields.io/clojars/v/geocoder-clj.svg]]
+  [[https://travis-ci.org/r0man/geocoder-clj][https://travis-ci.org/r0man/geocoder-clj.svg]]
+  [[https://versions.deps.co/r0man/geocoder-clj][https://versions.deps.co/r0man/geocoder-clj/status.svg]]
+  [[https://versions.deps.co/r0man/geocoder-clj][https://versions.deps.co/r0man/geocoder-clj/downloads.svg]]
+
+  A Clojure library for various geocoder services.
+
+** Usage
+   :PROPERTIES:
+   :CUSTOM_ID: usage
+   :END:
+
+*** Bing
+    :PROPERTIES:
+    :CUSTOM_ID: bing
+    :END:
+
+    #+BEGIN_SRC clojure :exports both :results verbatim
+      (require '[geocoder.bing :as bing])
+      (def geocoder (bing/geocoder {:api-key "MY-KEY"}))
+      (bing/geocode-address geocoder "Senefelderstraße 24, 10437 Berlin")
+      (bing/geocode-location geocoder "52.54258,13.42299")
+    #+END_SRC
+
+*** Geonames
+    :PROPERTIES:
+    :CUSTOM_ID: geonames
+    :END:
+
+    #+BEGIN_SRC clojure :exports both :results verbatim
+      (require '[geocoder.geonames :as geonames])
+      (def geocoder (geonames/geocoder {:api-key "MY-KEY"}))
+      (geonames/geocode-address geocoder "Senefelderstraße 24, 10437 Berlin")
+      (geonames/geocode-location geocoder "52.54258,13.42299")
+    #+END_SRC
+
+*** Google
+    :PROPERTIES:
+    :CUSTOM_ID: google
+    :END:
+
+    #+BEGIN_SRC clojure :exports both :results verbatim
+      (require '[geocoder.google :as google])
+      (def geocoder (google/geocoder {:api-key "MY-KEY"}))
+      (google/geocode-address geocoder "Senefelderstraße 24, 10437 Berlin")
+      (google/geocode-location geocoder "52.54258,13.42299")
+    #+END_SRC
+
+*** Maxmind
+    :PROPERTIES:
+    :CUSTOM_ID: maxmind
+    :END:
+
+    #+BEGIN_SRC clojure :exports both :results verbatim
+      (require '[geocoder.maxmind :as maxmind])
+      (def db (geonames/db "/usr/share/GeoIP/GeoIP.dat"))
+      (maxmind/geocode-ip-address db "92.229.192.11")
+    #+END_SRC
+
+** License
+   :PROPERTIES:
+   :CUSTOM_ID: license
+   :END:
+
+   Copyright (C) 2013-2019 r0man
+
+   Distributed under the Eclipse Public License, the same as Clojure.

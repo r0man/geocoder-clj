@@ -21,8 +21,11 @@
 (defn fetch-json
   "Send the request, parse the hyphenated JSON body of the response."
   [request]
-  (let [read-json #(parse-string %1 true)]
-    (->> (client/request request)
+  (let [read-json #(parse-string %1 keyword)]
+    (->> (merge
+          {:throw-exceptions true}
+          request)
+         (client/request)
          :body read-json hyphenate-keys)))
 
 (extend-protocol IPoint
