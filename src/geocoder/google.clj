@@ -12,8 +12,8 @@
 (s/def ::plus-code (s/keys :req-un [::compound-code ::global-code]))
 (s/def ::place-id string?)
 (s/def ::partial-match boolean?)
-(s/def ::lng number?)
-(s/def ::lat number?)
+(s/def ::lng (s/and number? #(>= % -180.0) #(<= % 180.0)))
+(s/def ::lat (s/and number? #(>= % -90.0) #(<= % 90.0)))
 (s/def ::southwest (s/keys :req-un [::lat ::lng]))
 (s/def ::northeast (s/keys :req-un [::lat ::lng]))
 (s/def ::viewport (s/keys :req-un [::northeast ::southwest]))
@@ -33,10 +33,10 @@
 (s/def ::result
   (s/keys :req-un
           [::address-components
-           ::formatted-address]
+           ::formatted-address
+           ::geometry]
           :opt-un
-          [::geometry
-           ::place-id
+          [::place-id
            ::types
            ::partial-match
            ::plus-code]))
@@ -83,7 +83,7 @@
   "Returns the country of `address`."
   [address]
   {:name (long-name address :country)
-   :iso-3166-1-alpha-2 (str/lower-case (short-name address :country))})
+   :iso-3166-1-alpha-2 (some-> (short-name address :country) str/lower-case)})
 
 (defn location
   "Returns the geographical location of `address`."

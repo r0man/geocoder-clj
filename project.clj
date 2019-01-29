@@ -8,7 +8,7 @@
   :dependencies [[cheshire "5.8.1"]
                  [clj-http "3.9.1"]
                  [com.maxmind.geoip2/geoip2 "2.12.0"]
-                 [inflections "0.13.1"]
+                 [inflections "0.13.2"]
                  [org.clojure/clojure "1.10.0"]]
   :profiles {:dev {:dependencies [[clj-http "3.9.1"]
                                   [org.clojure/test.check "0.9.0"]
