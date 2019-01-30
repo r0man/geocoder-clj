@@ -23,7 +23,7 @@
   (:admin-name1 address))
 
 (defn- request
-  "Make a Bing geocode request map."
+  "Make a geocode request map."
   [geocoder & [opts]]
   {:request-method :get
    :query-params
